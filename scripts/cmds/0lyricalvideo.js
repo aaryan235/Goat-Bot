@@ -7,8 +7,8 @@ module.exports = {
   threadStates: {},
 
   config: {
-    name: 'lv',
-    aliases: ['lev'],
+    name: 'lyricalvideo',
+    aliases: ['lvd'],
     version: '1.0',
     author: 'Kshitiz',
     countDown: 5,
