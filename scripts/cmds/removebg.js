@@ -32,7 +32,7 @@ module.exports = {
     } else {
       const threadmID = event.threadID;
       if (!approvedmain.includes(threadmID)) {
-        const msgSend = message.reply(cmd 'RemoveBG' is locked 🔒...\n Reason : Bot's main cmd \nyou need permission to use all main cmds.\n\nType ${p}requestMain to send a request to admin);
+        const msgSend = message.reply(cmd 'RemoveBG' is locked 🔒...\n Reason : Bots main cmd \nyou need permission to use all main cmds.\n\nType ${p}requestMain to send a request to admin);
         setTimeout(async () => {
           message.unsend((await msgSend).messageID);
         }, 40000);
