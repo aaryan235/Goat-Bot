@@ -4,7 +4,7 @@ const Tesseract = require("tesseract.js");
 module.exports = {
   config: {
     name: "i2t",
-    aliases: ["ocr2"],
+    aliases: ["gettext"],
     version: "1.0",
     author: "404",
     category: "goatbot",
