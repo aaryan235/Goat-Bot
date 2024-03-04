@@ -29,7 +29,7 @@ module.exports = {
 
 			const data2 = {
 				prompt: p,
-				cookie: "add your own cookie"
+				cookie: "1epylNUo5bI6a_yCaql1XwiMEi9UQmgbM_HJY-a2tGH71vjCsMqS69ptFkKTcnaxL4TEkrMC8-42C8RKXJxXlvF3_K8mf8EoCpWJNKWeYHgNIhcIFakBim06VZBT0JTK4i03FcSMRlpwvRazhKle7rIjQK1JiF06IccLdERyCv2PanL5FZl7y213ApFNH8UUD-blRxokbt7h-2JqtDjKczw"
 			};
 
 			const config = {
