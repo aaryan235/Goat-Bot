@@ -1,7 +1,7 @@
 const axios = require("axios");
 const fs = require("fs-extra");
 
-const apiKey = "RdjJDazKqAvUqNNsqDMb43cN";
+const apiKey = "y23eDUC1WArCW228kAe6zyUr";
 
 module.exports = {
     config: {
