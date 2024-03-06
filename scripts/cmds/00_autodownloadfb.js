@@ -1,90 +1,81 @@
-const fs = require("fs-extra");
-const axios = require("axios");
 
 module.exports = {
+  config: {
+    name: "autodl", 
+    version: "1.0.",
+    author: "Dipto",//convert by Mesbah Bb'e
+    countDown: 0,
+    role: 0,
+    longDescription: {
+      en: "Auto download video from tiktok, facebook, Instagram, YouTube, and more",
+      bn: "প্রতিবন্ধী, লিংক এর বাজার, ইন্ডিয়ান ম্যগি, বোকাছোদা, এবং আরো কিছু প্লাটফর্ম থেকে অটো ভিডিও ডাউনলোড করে"
+    },
+    category: "𝗠𝗘𝗗𝗜𝗔",
+    guide: {
+      en: "just send your link",
+      bn: "মনি কিছু লেখা লাগবে না"
+    }
+},
+  
+  onChat: async function ({ api, event, client, __GLOBAL }) {
 
-	threadStates: {},
+  const axios = require('axios');
+  const fs = require('fs');
 
-	config: {
-		name: 'autofb',
-		version: '1.0',
-		author: 'Kshitiz',
-		countDown: 5,
-		role: 0,
-		shortDescription: 'auto video downloader',
-		longDescription: '',
-		category: 'media',
-		guide: {
-			en: '{p}{n}',
-		}
-	},
-	onStart: async function ({ api, event }) {
-		const threadID = event.threadID;
+let dipto = event.body ? event.body : '';
 
+  try {
 
-		if (!this.threadStates[threadID]) {
-			this.threadStates[threadID] = {
-				autoFbEnabled: false,
-			};
-		}
+if (dipto.startsWith('https://vt.tiktok.com') || dipto.startsWith('https://www.facebook.com') || dipto.startsWith('https://www.instagram.com/') || dipto.startsWith('https://youtu.be/') || dipto.startsWith('https://youtube.com/') || dipto.startsWith('https://x.com/') || dipto.startsWith('https://twitter.com/') || dipto.startsWith('https://vm.tiktok.com') || dipto.startsWith('https://fb.watch')){
 
-		if (event.body.toLowerCase().includes('autofb')) {
-			if (event.body.toLowerCase().includes('on')) {
+  const d = api.sendMessage("downloading video, please wait...", event.threadID);
 
-				this.threadStates[threadID].autoFbEnabled = true;
-				api.sendMessage("AutoFB is now ON", event.threadID, event.messageID);
-			} else if (event.body.toLowerCase().includes('off')) {
+  if (!dipto) {
 
-				this.threadStates[threadID].autoFbEnabled = false;
-				api.sendMessage("AutoFB is now OFF.", event.threadID, event.messageID);
-			} else {
-				api.sendMessage("type 'autofb on' to turn on and\n'autofb off' to turn off.", event.threadID, event.messageID);
-			}
-		}
-	},
-	onChat: async function ({ api, event }) {
-		const threadID = event.threadID;
+    api.sendMessage("please put a valid video link", event.threadID, event.messageID);
 
-		if (this.threadStates[threadID] && this.threadStates[threadID].autoFbEnabled && this.checkLink(event.body)) {
-			var { url } = this.checkLink(event.body);
-			this.downLoad(url, api, event);
-			api.setMessageReaction("💐", event.messageID, (err) => {}, true);
-		}
-	},
-	downLoad: function (url, api, event) {
-		var time = Date.now();
-		var path = __dirname + `/cache/${time}.mp4`;
-		this.getLink(url).then(res => {
-			axios({
-				method: "GET",
-				url: res,
-				responseType: "arraybuffer"
-			}).then(res => {
-				fs.writeFileSync(path, Buffer.from(res.data, "utf-8"));
-				if (fs.statSync(path).size / 1024 / 1024 > 25) {
-					return api.sendMessage("The file is too large, cannot be sent", event.threadID, () => fs.unlinkSync(path), event.messageID);
-				}
-				api.sendMessage({
-					body: "Successful Download!",
-					attachment: fs.createReadStream(path)
-				}, event.threadID, () => fs.unlinkSync(path), event.messageID);
-			}).catch(err => console.error(err));
-		}).catch(err => console.error(err));
-	},
-	getLink: function (url) {
-		return new Promise((resolve, reject) => {
-			axios({
-				method: "GET",
-				url: `https://api.samirthakuri.repl.co/api/videofb?url=${url}`
-			}).then(res => resolve(res.data.video)).catch(err => reject(err));
-		});
-	},
-	checkLink: function (url) {
-		if (url.includes("facebook")) {
-			return {
-				url: url
-			};
-		}
-		return null;
-	}
-};
+    return;
+
+    }
+
+    const path = __dirname + `/cache/diptoo.mp4`;
+
+    const aa = await axios.get(`https://d1pt0-all.onrender.com/xnxx?url=${encodeURI(dipto)}`);
+
+   const bb = aa.data;
+
+    const vid = (await axios.get(bb.result, { responseType: "arraybuffer", })).data;
+
+    fs.writeFileSync(path, Buffer.from(vid, 'utf-8'));
+    api.sendMessage({
+
+      body: `${bb.cp}`,
+
+      attachment: fs.createReadStream(path) }, event.threadID, () => fs.unlinkSync(path), event.messageID)}
+
+if (dipto.startsWith('https://i.imgur.com')){
+
+  const dipto3 = dipto.substring(dipto.lastIndexOf('.'));
+
+  const response = await axios.get(dipto, { responseType: 'arraybuffer' });
+
+const filename = __dirname + `/cache/dipto${dipto3}`;
+
+    fs.writeFileSync(filename, Buffer.from(response.data, 'binary'));
+await api.unsendMessage(d.messageID);
+    api.sendMessage({body: `Downloaded from link`,attachment: fs.createReadStream(filename)},event.threadID,
+
+  () => fs.unlinkSync(filename),event.messageID)
+
+}
+
+} catch (e) {
+
+api.sendMessage(`${e}`, event.threadID, event.messageID);
+  }
+  },
+
+onStart: function({ api, event, client, __GLOBAL }) {
+
+}
+}
