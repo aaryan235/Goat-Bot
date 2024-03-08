@@ -1,39 +1,51 @@
-const { get } = require('axios');
+const axios = require("axios");
+const fs = require("fs-extra");
 
 module.exports = {
-	config: {
-		name: "gojo",
-		author: "deku",
-		version: "2.0",
-		cooldowns: 0,
-		role: 0,
-		shortDescription: {
-			en: "Talk to GOJO AI the blindfolded sorcerer (with continuous conversation)"
-		},
-		category: "AI",
-		guide: {
-			en: "To use this command, type 'gojo' followed by your message. For example: 'gojo hi'"
-		}
-	},
+    config: {
+        name: "cdp",
+        aliases: ["cdp", "pairdp"],
+        version: "2.0",
+        author: "RUBISH",
+        countDown: 5,
+        role: 0,
+        shortDescription: {
+            en: "Random Couple dp"
+        },
+        longDescription: {
+            en: "Random Couple dp"
+        },
+        category: "image",
+        guide: {
+            en: "{pn}"
+        }
+    },
 
-	onStart: async function ({ api, event, args }) {
-		const prompt = args.join(' ');
-		const id = event.senderID;
+    onStart: async function ({ api, event, args }) {
+        try {
+            const response = await axios.get("https://cdp-rubish-api.onrender.com/api-cdp");
+            const data = response.data;
 
-		function sendMessage(msg) {
-			api.sendMessage(msg, event.threadID, event.messageID);
-		}
+            const maleImgResponse = await axios.get(data.images[0], { responseType: "arraybuffer" });
+            fs.writeFileSync(__dirname + "/tmp/img1.png", Buffer.from(maleImgResponse.data, "utf-8"));
+            const femaleImgResponse = await axios.get(data.images[1], { responseType: "arraybuffer" });
+            fs.writeFileSync(__dirname + "/tmp/img2.png", Buffer.from(femaleImgResponse.data, "utf-8"));
 
-		const url = "http://eu4.diresnode.com:3301";
+            const msg = `
+✅ | Here is your couple dp 
 
-		if (!prompt) return sendMessage("Missing input!\n\nIf you want to reset the conversation with " + this.config.name + " you can use '" + this.config.name + " clear'");
-		sendMessage("🔍…");
+⦿ ID: ${data.serialNumber}`;
+            const allImages = [
+                fs.createReadStream(__dirname + "/tmp/img1.png"),
+                fs.createReadStream(__dirname + "/tmp/img2.png")
+            ];
 
-		try {
-			const response = await get(`${url}/gojo_gpt?prompt=${encodeURIComponent(prompt)}&idd=${id}`);
-			sendMessage(response.data.gojo);
-		} catch (error) {
-			sendMessage(error.message);
-		}
-	},
+            await api.sendMessage({
+                body: msg,
+                attachment: allImages
+            }, event.threadID, event.messageID);
+        } catch (error) {
+            console.error(error);
+        }
+    }
 };
