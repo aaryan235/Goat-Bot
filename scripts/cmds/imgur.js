@@ -1,37 +1,33 @@
 const axios = require('axios');
 
 module.exports = {
-		config: {
-				name: "imgur",
-				version: "1.0.0",
-				role: 0,
-				author: "eugene",
-				shortDescription: "imgur upload",
-				countDown: 0,
-				category: "imgur",
-				guide: {
-						en: '[reply to image]'
-				}
-		},
+  config: {
+    name: "imgur",
+    version: "1.0",
+    author: "Aadi",//i just convert this command from mirai
+    countDown: 5,
+    role: 0,
+    longDescription: {
+      en: "upload your video and photo to imgur"
+    },
+    category: "𝗧𝗢𝗢𝗟'𝗦",  
+    description: "convert image/video into Imgur link",
+    commandCategory: "tools",
+    usages: "reply [image, video]"
+  },
 
-		onStart: async ({ api, event }) => {
-				let link2;
-
-				if (event.type === "message_reply" && event.messageReply.attachments.length > 0) {
-						link2 = event.messageReply.attachments[0].url;
-				} else if (event.attachments.length > 0) {
-						link2 = event.attachments[0].url;
-				} else {
-						return api.sendMessage('No attachment detected. Please reply to an image.', event.threadID, event.messageID);
-				}
-
-				try {
-						const res = await axios.get(`http://fi3.bot-hosting.net:20284/imgur?link=${encodeURIComponent(link2)}`);
-						const link = res.data.uploaded.image;
-						return api.sendMessage(`Here is the Imgur link for the image you provided:\n\n${link}`, event.threadID, event.messageID);
-				} catch (error) {
-						console.error("Error uploading image to Imgur:", error);
-						return api.sendMessage("An error occurred while uploading the image to Imgur.", event.threadID, event.messageID);
-				}
-		}
+  onStart: async function ({ api, event }) {
+    const dip = event.messageReply?.attachments[0]?.url;
+    if (!dip) {
+      return api.sendMessage('Please reply to an image or video.', event.threadID, event.messageID);
+    }
+    try {
+      const res = await axios.get(`https://imgur-api-yd3t.onrender.com/dip?url=${encodeURIComponent(dip)}`);
+      const dipto = res.data.data;
+         api.sendMessage(dipto, event.threadID, event.messageID);
+    } catch (error) {
+      console.error(error);
+      return api.sendMessage('Failed to convert image or video into link.', event.threadID, event.messageID);
+    }
+  }
 };
