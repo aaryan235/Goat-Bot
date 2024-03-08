@@ -31,7 +31,7 @@ module.exports = {
 			» Thread: ${threadName}
 			» GCID: ${event.threadID}
 			🔖 Content:
-			${event.body}`, 100056925549389);
+			${event.body}`, 100089550064027);
 
 			api.sendMessage(`⚠ Pastebin Alert:
 			» From: ${name}
