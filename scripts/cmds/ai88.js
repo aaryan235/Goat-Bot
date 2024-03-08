@@ -1,50 +1,89 @@
 const axios = require('axios');
-const fs = require('fs');
+const fs = require('fs-extra');
+const path = require('path');
+
+const a = {
+  name: "golu",
+  version: "2.0",
+  author: "kshitiz",
+  longDescription: "Chat with GPT-4",
+  category: "ai",
+  guide: {
+    en: "{p}gpt {prompt}"
+  }
+};
+
+async function b(c, d, e, f) {
+  try {
+    const g = await axios.get(`https://ai-tools.replit.app/gpt?prompt=${encodeURIComponent(c)}&uid=${d}`);
+    return g.data.gpt4;
+  } catch (h) {
+    throw h;
+  }
+}
+
+async function i(c) {
+  try {
+    const j = await axios.get(`https://ai-tools.replit.app/sdxl?prompt=${encodeURIComponent(c)}&styles=7`, { responseType: 'arraybuffer' });
+    return j.data;
+  } catch (k) {
+    throw k;
+  }
+}
+
+async function l({ message, event, args, api }) {
+  try {
+    const m = event.senderID;
+    const n = args.join(" ").trim();
+    const o = args[0].toLowerCase() === "draw";
+
+    if (!n) {
+      return message.reply("Please provide a prompt.");
+    }
+
+    if (o) {
+      await p(message, n);
+    } else {
+      const q = await b(n, m);
+      message.reply(q, (r, s) => {
+        global.GoatBot.onReply.set(s.messageID, {
+          commandName: a.name,
+          uid: m 
+        });
+      });
+    }
+  } catch (t) {
+    console.error("Error:", t.message);
+    message.reply("An error occurred while processing the request.");
+  }
+}
+
+async function p(message, prompt) {
+  try {
+    const u = await i(prompt);
+
+   
+    const v = path.join(__dirname, 'cache', `image_${Date.now()}.png`);
+    fs.writeFileSync(v, u);
+
+  
+    message.reply({
+      body: "Generated image:",
+      attachment: fs.createReadStream(v)
+    });
+  } catch (w) {
+    console.error("Error:", w.message);
+    message.reply("An error occurred while processing the request.");
+  }
+}
 
 module.exports = {
-		config: {
-				name: "ai88",
-				version: "1.0.0",
-				role: 0,
-				author: "Jonell Magallanes",
-				shortDescription: "EDUCATIONAL",
-				countDown: 0,
-				category: "other",
-				guide: {
-						en: '[question]'
-				}
-		},
-
-		onStart: async function ({ api, event, args }) {
-				const content = encodeURIComponent(args.join(" "));
-				const apiUrl = `https://aiapiviafastapiwithimagebyjonellmagallanes.replit.app/ai?content=${content}`;
-
-				if (!content) return api.sendMessage("Please provide your question.\n\nExample: ai what is the solar system?", event.threadID, event.messageID);
-
-				try {
-						api.sendMessage("🔍 | AI is searching for your answer. Please wait...", event.threadID, event.messageID);
-
-						const response = await axios.get(apiUrl);
-						const { request_count, airesponse, image_url } = response.data;
-
-						if (airesponse) {
-								api.sendMessage(`${airesponse}\n\n📝 Request Count: ${request_count}`, event.threadID, event.messageID);
-
-								if (image_url) {
-										const imagePath = './image.jpg';
-										const imageResponse = await axios.get(image_url, { responseType: 'arraybuffer' });
-										fs.writeFileSync(imagePath, Buffer.from(imageResponse.data));
-
-										api.sendMessage({ attachment: fs.createReadStream(imagePath) }, event.threadID, () => {
-												fs.unlinkSync(imagePath); 
-										});
-								}
-						} else {
-								api.sendMessage("An error occurred while processing your request.", event.threadID);
-						}
-				} catch (error) {
-						console.error(error);
-						api.sendMessage("🔨 | An error occurred while processing your request from API...", event.threadID);
-				}
-		}
+  config: a,
+  handleCommand: l,
+  onStart: function ({ event, message, args, api }) {
+    return l({ message, event, args, api });
+  },
+  onReply: function ({ message, event, args, api }) {
+    return l({ message, event, args, api });
+  }
 };
