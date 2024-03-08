@@ -3,7 +3,7 @@ const s = require("srtn");
 
 module.exports = {
  config: {
- name: "dalle",
+ name: "6dalle",
  role: 0,
  },
  onStart: async function ({ message, api, args, event }) {
