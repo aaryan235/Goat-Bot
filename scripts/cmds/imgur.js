@@ -10,7 +10,7 @@ module.exports = {
     longDescription: {
       en: "upload your video and photo to imgur"
     },
-    category: "𝗧𝗢𝗢𝗟'𝗦",  
+    category: "𝗧𝗢𝗢𝗟𝗦",  
     description: "convert image/video into Imgur link",
     commandCategory: "tools",
     usages: "reply [image, video]"
