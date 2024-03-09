@@ -33,7 +33,7 @@ module.exports = {
 
       const randomCookie = cookies[Math.floor(Math.random() * cookies.length)];
 
-      const apiURL = `https://dall-e-3-rubish.onrender.com/api/gen-img-url?prompt=${encodedPrompt}&cookie=${randomCookie}&apiKey=${Key}`;
+      const apiURL = `https://dall-e-3-rubish-api.onrender.com/api/gen-img-url?prompt=${encodedPrompt}&cookie=${randomCookie}&apiKey=${Key}`;
 
       const startTime = Date.now();
       const processingMessage = await message.reply(`
