@@ -1,85 +1,68 @@
-const fs = require("fs");
-const path = require("path");
 const axios = require("axios");
-const tinyurl = require('tinyurl');
-
+const { getStreamFromURL } = global.utils;
+ 
 module.exports = {
-  config: {
-    name: "pixart",
-    aliases: [],
-    version: "1.0",
-    author: "Kshitiz",
-    countDown: 20,
-    role: 0,
-    shortDescription: "lado puti",
-    longDescription: "image to image",
-    category: "game",
-    guide: {
-      en: "{p}pxart reply to image"
+    config: {
+        name: "nijix",
+        aliases: ["nijijourneyx"],
+        version: "1.0",
+        author: "SiAM | Turtle APIs",
+        countDown: 5,
+        role: 0,
+        longDescription: "Text to Image",
+        category: "ai",
+        guide: {
+            en: "{pn} prompt --ar [ratio] or reply an image\n\n Example: {pn} 1girl, cute face, masterpiece, best quality --ar 16:9\n[ default 1:1 ]"
+        }
+    },
+ 
+    onStart: async function({ api, args, message, event }) {
+        try {
+ 
+            let prompt = "";
+            let imageUrl = "";
+            let aspectRatio = ""; 
+ 
+            const aspectIndex = args.indexOf("--ar");
+            if (aspectIndex !== -1 && args.length > aspectIndex + 1) {
+                aspectRatio = args[aspectIndex + 1];
+                args.splice(aspectIndex, 2); 
+            }
+ 
+            if (event.type === "message_reply" && event.messageReply.attachments && event.messageReply.attachments.length > 0 && ["photo", "sticker"].includes(event.messageReply.attachments[0].type)) {
+                imageUrl = encodeURIComponent(event.messageReply.attachments[0].url);
+            } else if (args.length === 0) {
+                message.reply("Please provide a prompt or reply to an image.");
+                return;
+            }
+ 
+            if (args.length > 0) {
+                prompt = args.join(" ");
+            }
+ 
+ 
+            let apiUrl = `https://project-niji.onrender.com/api/generate?prompt=${encodeURIComponent(prompt)}.&aspectRatio=${aspectRatio}&apikey=rehat&key=siam`;
+            if (imageUrl) {
+                apiUrl += `&imageUrl=${imageUrl}`;
+            }
+ 
+            const processingMessage = await message.reply("⛵ Initiating request");
+            message.reaction("⏳", event.messageID);
+ 
+            const response = await axios.post(apiUrl);
+            const img = response.data.url;
+ 
+            const downloadLink = `Your Imagination Is Created 🌟\nDownload: ${img}`;
+            await message.reply({
+                body: downloadLink,
+                attachment: await getStreamFromURL(img)
+            });
+            message.unsend(processingMessage.messageID);
+            await message.reaction("✅", event.messageID);
+        } catch (error) {
+            console.error(error);
+            message.reply("An error occurred.");
+            message.reaction("❌", event.messageID);
+        }
     }
-  },
-  onStart: async function ({ message, event, args }) {
-    try {
-      const promptApiUrl = "https://www.api.vyturex.com/describe?url="; // api credit Jarif
-      const pixartApiUrl = "https://ai-tools.replit.app/pixart";
-
-      if (event.type !== "message_reply") {
-        return message.reply("❌ | Please reply to an image to use the command.");
-      }
-
-      const attachment = event.messageReply.attachments[0];
-      if (!attachment || !["photo", "sticker"].includes(attachment.type)) {
-        return message.reply("❌ | Reply must be an image.");
-      }
-
-     
-      const imageUrl = await tinyurl.shorten(attachment.url);
-
-   
-      const promptResponse = await axios.get(promptApiUrl + encodeURIComponent(imageUrl));
-      let prompt = promptResponse.data;
-
-     
-      const [promptArg, styleArg] = args.join(" ").split("|").map(item => item.trim());
-
-     
-      if (promptArg) {
-        prompt = promptArg;
-      }
-
-      
-      let style = 3;
-      if (styleArg) {
-        style = parseInt(styleArg);
-      }
-
-      
-      const pixartResponse = await axios.get(pixartApiUrl, {
-        params: {
-          prompt: prompt,
-          styles: style
-        },
-        responseType: "arraybuffer"
-      });
-
-     
-      const cacheFolderPath = path.join(__dirname, "/cache");
-      if (!fs.existsSync(cacheFolderPath)) {
-        fs.mkdirSync(cacheFolderPath);
-      }
-      const imagePath = path.join(cacheFolderPath, ${Date.now()}_generated_image.png);
-      fs.writeFileSync(imagePath, Buffer.from(pixartResponse.data, "binary"));
-
-    
-      const stream = fs.createReadStream(imagePath);
-      message.reply({
-        body: "",
-        attachment: stream
-      });
-
-    } catch (error) {
-      console.error("Error:", error);
-      message.reply("❌ | An error occurred. Please try again later.");
-    }
-  }
 };
