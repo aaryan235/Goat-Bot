@@ -1,4 +1,4 @@
-cmd install reactunsend.js module.exports = {
+module.exports = {
   config: {
     name: "reactunsend",
     version: "1.0",
