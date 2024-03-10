@@ -1,60 +1,51 @@
-const axios = require('axios');
+const axios = require("axios");
+const request = require("request");
+const fs = require("fs");
 
 module.exports = {
-	config: {
-		name: "waifu",
-		aliases: ["wife"],
-		version: "1.0",
-		author: "tas3n",
-		countDown: 6,
-		role: 0,
-		shortDescription: "get random waifu",
-		longDescription: "Get waifu neko: waifu, neko, shinobu, megumin, bully, cuddle, cry, kiss, lick, hug, awoo, pat, smug, bonk, yeet, blush, smile, wave, highfive, handhold, nom, bite, glomp, slap, kill, kick, happy, wink, poke, dance, cringe",
-		category: "anime",
-		guide: "{pn} {{<name>}}"
-	},
+  config: {
+    name: "wifey",
+    aliases: [],
+    version: "1.0",
+    author: "kshitiz",
+    countDown: 20,
+    role: 0,
+    shortDescription: "get a temporary wifey haha",
+    longDescription: "get a temporary wife",
+    category: "fun",
+    guide: "{pn} wifey",
+  },
+  onStart: async function ({ api, event, message }) {
+    try {
 
-	onStart: async function ({ message, args }) {
-		const name = args.join(" ");
-		if (!name)
+      message.reply("𝘆𝗼𝘂𝗿 𝘁𝗲𝗺𝗽𝗼𝗿𝗮𝗿𝘆 𝘄𝗶𝗳𝗲𝘆 𝗶𝘀 𝗹𝗼𝗮𝗱𝗶𝗻𝗴🥵..");
 
-			try {
-				let res = await axios.get(`https://api.waifu.pics/sfw/waifu`)
+      const response = await axios.post("https://your-shoti-api.vercel.app/api/v1/get", {
+        apikey: "$shoti-1hecj3cvm6r1mf91948",
+      });
 
+      const file = fs.createWriteStream(__dirname + "/cache/shoti.mp4");
 
-				let res2 = res.data
-				let img = res2.url
+      const rqs = request(encodeURI(response.data.data.url));
+      rqs.pipe(file);
 
-				const form = {
-					body: `   「 𝔀𝓪𝓲𝓯𝓾  」   `
+      file.on("finish", async () => {
 
-				};
-				if (img)
-					form.attachment = await global.utils.getStreamFromURL(img);
-				message.reply(form);
-			} catch (e) {
-				message.reply(` Not Found`)
-			}
+        await api.sendMessage(
+          {
+            body: `@${response.data.data.user.username}\n𝗗𝗮𝗺𝗻 𝘆𝗼𝘂𝗿 𝘁𝗲𝗺𝗽𝗼𝗿𝗮𝗿𝘆 𝘄𝗶𝗳𝗲𝘆🥵`,
+            attachment: fs.createReadStream(__dirname + "/cache/shoti.mp4"),
+          },
+          event.threadID,
+          event.messageID
+        );
+      });
 
-
-		else {
-
-			try {
-				let res = await axios.get(`https://api.waifu.pics/sfw/${name}`)
-
-
-				let res2 = res.data
-				let img1 = res2.url
-
-				const form = {
-					body: `   「 𝔀𝓪𝓲𝓯𝓾  」   `
-
-				};
-				if (img1)
-					form.attachment = await global.utils.getStreamFromURL(img1);
-				message.reply(form);
-			} catch (e) { message.reply(` No waifu  \category: waifu, neko, shinobu, megumin, bully, cuddle, cry, kiss, lick, hug, awoo, pat, smug, bonk, yeet, blush, smile, wave, highfive, handhold, nom, bite, glomp, slap, kill, kick, happy, wink, poke, dance, cringe `) }
-
-		}
-	}
+      file.on("error", (err) => {
+        api.sendMessage(`Shoti Error: ${err}`, event.threadID, event.messageID);
+      });
+    } catch (error) {
+      api.sendMessage("An error occurred while generating video:" + error, event.threadID, event.messageID);
+    }
+  },
 };
