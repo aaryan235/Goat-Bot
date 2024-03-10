@@ -2,67 +2,102 @@ const axios = require("axios");
 const fs = require("fs-extra");
 const path = require("path");
 
- 
 module.exports = {
   config: {
-    name: "pinterest",
+    name: "pin",
     aliases: ["pin"],
-    version: "1.0",
-    author: "Orochi Team",
+    version: "1.0.2",
+    author: "Kshitiz",
     role: 0,
-    countDown: 1,
-    longDescription: {
-      en: "Get Image From Pinterest",
+    countDown: 40,
+    shortDescription: {
+      en: "Search images on Pinterest",
     },
-    category: "Search",
+    longDescription: {
+      en: "get images from pinterest",
+    },
+    category: "𝗠𝗘𝗗𝗜𝗔",
     guide: {
-      en: "{pn} <search query> <number of images>\nExample: {pn} Tomozaki -5"
-    }
+      en: "{p}pin <search query> -<number of images>",
+    },
   },
 
-  onStart: async function ({ api, event, args }) {
+  onStart: async function ({ api, event, args, config }) {
     try {
       const keySearch = args.join(" ");
       if (!keySearch.includes("-")) {
         return api.sendMessage(
-          "⛔ 𝗜𝗡𝗩𝗔𝗟𝗜𝗗 𝗨𝗦𝗘\ \n❍➤ Please enter the search query and -number of images (1 - 20)",
+          `Please enter the search query and the number of images ${config.guide.en}`,
           event.threadID,
           event.messageID
         );
       }
-      const keySearchs = keySearch.substr(0, keySearch.indexOf("-"));
-      let numberSearch = keySearch.split("-").pop() || 20;
-      if (numberSearch > 20) {
-        numberSearch = 20;
+      const keySearchs = keySearch.substr(0, keySearch.indexOf("-")).trim();
+      const numberSearch =
+        parseInt(keySearch.split("-").pop().trim()) || 6;
+
+      const apiUrl = `https://code-merge-api-hazeyy01.replit.app/pinterest/api?search=${encodeURIComponent(// api credit hazayy
+        keySearchs
+      )}`;
+
+      const response = await axios.get(apiUrl);
+      const data = response.data.data;
+
+      if (data.length === 0) {
+        return api.sendMessage(
+          `No images found for "${keySearchs}"`,
+          event.threadID,
+          event.messageID
+        );
       }
 
-      const apiUrl = `https://api-samirxyz.onrender.com/api/Pinterest?query=${encodeURIComponent(keySearchs)}& number=${numberSearch}&apikey=global`;
-
-      const res = await axios.get(apiUrl);
-      const data = res.data.result;
       const imgData = [];
 
       for (let i = 0; i < Math.min(numberSearch, data.length); i++) {
         const imgResponse = await axios.get(data[i], {
-          responseType: "arraybuffer"
+          responseType: "arraybuffer",
         });
         const imgPath = path.join(__dirname, "cache", `${i + 1}.jpg`);
         await fs.outputFile(imgPath, imgResponse.data);
         imgData.push(fs.createReadStream(imgPath));
       }
 
-      await api.sendMessage({
-        attachment: imgData,
-      }, event.threadID, event.messageID);
+      await api.sendMessage(
+        {
+          attachment: imgData,
+          body: `Here are the top ${imgData.length} image results for "${keySearchs}":`,
+        },
+        event.threadID,
+        event.messageID
+      );
 
-      await fs.remove(path.join(__dirname, "cache"));
+     
+      await cleanFolder(path.join(__dirname, "cache"));
+
     } catch (error) {
       console.error(error);
       return api.sendMessage(
-        `An error occurred.`,
+        `Error processing the request. Please try again.`,
         event.threadID,
         event.messageID
       );
     }
-  }
+  },
 };
+
+
+async function cleanFolder(folderPath) {
+  try {
+    const files = await fs.readdir(folderPath);
+
+    for (const file of files) {
+      const filePath = path.join(folderPath, file);
+      await fs.unlink(filePath);
+      console.log(`File ${file} deleted successfully from ${folderPath}!`);
+    }
+
+    console.log(`All files in the ${folderPath} folder deleted successfully!`);
+  } catch (error) {
+    console.error(`Error cleaning folder: ${error}`);
+  }
+}
