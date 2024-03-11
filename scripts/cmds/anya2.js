@@ -1,74 +1,40 @@
-const axios = require("axios");
 const fs = require("fs-extra");
+const axios = require("axios");
 const path = require("path");
+const { getPrefix } = global.utils;
+const { commands, aliases } = global.GoatBot;
+const doNotDelete = "🔓 | Bulma 𝑨𝑰";
 
 module.exports = {
-	config: {
-		name: "anya2",
-		aliases: [],
-		author: "kshitiz",
-		version: "2.0",
-		cooldowns: 5,
-		role: 0,
-		shortDescription: {
-			en: ""
-		},
-		longDescription: {
-			en: "japnese anya text to speech"
-		},
-		category: "𝗔𝗜",
-		guide: {
-			en: "{p}{n} japn [text]"
-		}
-	},
-	onStart: async function ({ api, event, args }) {
-		try {
-			const {
-				createReadStream,
-				unlinkSync
-			} = fs;
+    config: {
+        name: "listallcmd",
+        version: "1.0",
+        author: "kshitiz,// original author Hassan",
+        countDown: 5,
+        role: 0,
+        shortDescription: {
+            en: "List all available commands",
+        },
+        longDescription: {
+            en: "View a comprehensive list of all available commands",
+        },
+        category: "Admin 🛠",
+        guide: {
+            en: "{pn} / listallcmd",
+        },
+        priority: 1,
+    },
 
-			const {
-				resolve
-			} = path;
+    onStart: async function ({ message, args, event, threadsData, role }) {
+        const { threadID } = event;
+        const threadData = await threadsData.get(threadID);
+        const prefix = getPrefix(threadID);
 
-			const {
-				messageID,
-				threadID,
-				senderID
-			} = event;
+        const allCommands = Array.from(commands.keys());
+        const commandList = allCommands.join(", ");
 
-			const name = "Anya"; 
+        const response = `Here is a list of all available commands: ${commandList}`;
 
-			const ranGreetVar = [`Konichiwa ${name}`, "Konichiwa senpai", "Hora"];
-			const ranGreet = ranGreetVar[Math.floor(Math.random() * ranGreetVar.length)];
-
-			const chat = args.join(" ");
-
-			if (!args[0]) return api.sendMessage(`${ranGreet}`, threadID, messageID);
-
-			const simRes = ` ${chat}`;
-
-
-			const text = encodeURIComponent(simRes);
-
-			const audioPath = resolve(__dirname, 'cache', `${threadID}_${senderID}.wav`);
-
-			const audioApi = await axios.get(`https://api.tts.quest/v3/voicevox/synthesis?text=${text}&speaker=3`);
-
-			const audioUrl = audioApi.data.mp3StreamingUrl;
-
-			await global.utils.downloadFile(audioUrl, audioPath);
-
-			const att = createReadStream(audioPath);
-
-			api.sendMessage({
-				body: simRes,
-				attachment: att
-			}, threadID, () => unlinkSync(audioPath));
-		} catch (error) {
-			console.error(error);
-			api.sendMessage("error", threadID, messageID);
-		}
-	}
+        await message.reply(response);
+    },
 };
