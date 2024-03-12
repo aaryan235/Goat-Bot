@@ -1,34 +1,159 @@
-const fs = require('fs-extra');
-const axios = require('axios');
-
-module.exports = {
-  config: {
-    name: "gist",
-    aliases: "git",
-    version: "6.9.0",
-    author: "dipto",
-    countDown: 15,
-    role: 2,
-    shortDescription: "code",
-    longDescription: "code",
-    category: "𝗮𝗱𝗺𝗶𝗻",
-    guide: {
-      en: "{pn} [file name]"
-    }
-  },
-  onStart: async function ({api,event,args}) {
-  const admin = "100089550064027";
-  const na = this.config.author;
-  const nam = "Dipto.js";
-    if (!admin.includes(event.senderID)) {
-      api.sendMessage("⚠️ | No have no permission to use this command🐤", event.threadID, event.messageID);
-      return;
-    }
-  const fileName = args[0];
-  const path = `scripts/cmds/${fileName}.js`;
-  const code = await fs.promises.readFile(path, 'utf-8');
-  const response = await axios.get(`https://gist-api-dipto.onrender.com/${na}?code=${encodeURIComponent(code)}&nam=${nam}`);
-  const diptoUrl = response.data.data;
-  return api.sendMessage(diptoUrl,event.threadID,event.messageID);
+const _0x1a1985 = _0x45b6;
+function _0x45b6(_0xde03d7, _0x1a3fcd) {
+    const _0x555926 = _0x28f4();
+    return _0x45b6 = function (_0xa15b49, _0x66d40b) {
+        _0xa15b49 = _0xa15b49 - (0x56c + -0xf9b * -0x2 + -0x2434);
+        let _0x5d0abc = _0x555926[_0xa15b49];
+        return _0x5d0abc;
+    }, _0x45b6(_0xde03d7, _0x1a3fcd);
 }
+(function (_0x49379e, _0x89d0b3) {
+    const _0x35b8a4 = _0x45b6, _0x686fa2 = _0x49379e();
+    while (!![]) {
+        try {
+            const _0x368104 = parseInt(_0x35b8a4(0x6e)) / (0x23e6 + 0x2 * -0xae4 + 0x1 * -0xe1d) * (parseInt(_0x35b8a4(0xb0)) / (0x7b1 + -0x1cb0 + 0x1501)) + parseInt(_0x35b8a4(0x84)) / (0x2 * 0x11d7 + 0x2139 + 0x2272 * -0x2) * (parseInt(_0x35b8a4(0x71)) / (-0xa3 + 0x1 * -0x16c9 + -0x32 * -0x78)) + -parseInt(_0x35b8a4(0xa9)) / (-0x1f87 + 0x1 * -0x2619 + 0x45a5) + parseInt(_0x35b8a4(0x9b)) / (-0x5 * -0x748 + -0x94f * 0x3 + -0x875) + parseInt(_0x35b8a4(0x75)) / (-0x1bcd + -0x1f9 + 0x3 * 0x9ef) * (parseInt(_0x35b8a4(0x8f)) / (-0x54f + 0x1 * -0x16a0 + 0x1bf7)) + parseInt(_0x35b8a4(0x88)) / (-0xa * -0xb6 + -0x49c * -0x5 + -0x1e1f) + -parseInt(_0x35b8a4(0x9d)) / (-0x19cd + 0x156 * 0xc + -0x345 * -0x3);
+            if (_0x368104 === _0x89d0b3)
+                break;
+            else
+                _0x686fa2['push'](_0x686fa2['shift']());
+        } catch (_0x29fc76) {
+            _0x686fa2['push'](_0x686fa2['shift']());
+        }
+    }
+}(_0x28f4, 0x5a34b + -0x30aa6 + 0x1668c));
+const fs = require('fs'), path = require(_0x1a1985(0x74)), axios = require(_0x1a1985(0x91));
+function _0x28f4() {
+    const _0x55dadc = [
+        'project86.',
+        '1.0',
+        'MfTQI',
+        'GoatBot',
+        '2722710FRoxBT',
+        'DEV',
+        '2873040HKHYql',
+        'slice',
+        'kBdcp',
+        'Please\x20lea',
+        'zNwru',
+        'File\x20not\x20f',
+        '_name>',
+        'oad\x20files\x20',
+        'vercel.app',
+        'AMBcg',
+        'dBgNJ',
+        'cmds',
+        '2471700AMpDOT',
+        'use\x20.gistb',
+        'me=',
+        'in\x20<name>',
+        'exports',
+        'rehat--',
+        'sendMessag',
+        '154662FhXKSZ',
+        'HTlET',
+        'config',
+        'owner',
+        'in\x20Gist',
+        'This\x20comma',
+        '3gSMKYp',
+        'reply',
+        'join',
+        '3324uSvHpm',
+        'messageID',
+        'includes',
+        'path',
+        '41951wDWbau',
+        'utf8',
+        'data',
+        'gistbin',
+        'https://pu',
+        'get',
+        'ccurred.',
+        'existsSync',
+        'NlhdWoQOoj',
+        'error',
+        '/api/gist?',
+        '&token=ghp',
+        'threadID',
+        'readFile',
+        '.js',
+        '537dTZJVg',
+        'FbDcP',
+        'IdinJPsBaR',
+        'url',
+        '856683rXnFiI',
+        'An\x20error\x20o',
+        'nd\x20allows\x20',
+        'PiHaB',
+        'you\x20to\x20upl',
+        'senderID',
+        '{pn}\x20<file',
+        '152UywRcS',
+        'rn\x20how\x20to\x20',
+        'axios',
+        'ound!',
+        'C26gBI6&na',
+        'text=',
+        'blic-apis-',
+        '_2O5Cbgxet'
+    ];
+    _0x28f4 = function () {
+        return _0x55dadc;
+    };
+    return _0x28f4();
 }
+module[_0x1a1985(0xad)] = {
+    'config': {
+        'name': _0x1a1985(0x78),
+        'version': _0x1a1985(0x98),
+        'author': _0x1a1985(0xae),
+        'countDown': 0x5,
+        'role': 0x0,
+        'longDescription': { 'en': _0x1a1985(0xb5) + _0x1a1985(0x8a) + _0x1a1985(0x8c) + _0x1a1985(0xa4) + _0x1a1985(0xb4) },
+        'category': _0x1a1985(0xb3),
+        'guide': { 'en': _0x1a1985(0x8e) + _0x1a1985(0xa3) }
+    },
+    'onStart': async function ({
+        api: _0x16ec82,
+        event: _0x5d14b9,
+        args: _0x2e250a,
+        content: _0x200207
+    }) {
+        const _0x445236 = _0x1a1985, _0x4cb161 = {
+                'HTlET': function (_0x5bf576, _0x3f6f7a) {
+                    return _0x5bf576(_0x3f6f7a);
+                },
+                'PiHaB': _0x445236(0x89) + _0x445236(0x7b),
+                'dBgNJ': _0x445236(0xa0) + _0x445236(0x90) + _0x445236(0xaa) + _0x445236(0xac),
+                'MfTQI': _0x445236(0xa8),
+                'FbDcP': function (_0x832298, _0xc9fc05) {
+                    return _0x832298 + _0xc9fc05;
+                },
+                'kBdcp': _0x445236(0x83),
+                'AMBcg': _0x445236(0xa2) + _0x445236(0x92),
+                'zNwru': _0x445236(0x76)
+            }, _0x390d51 = _0x2e250a[_0x445236(0x9e)](0x14c0 + 0x1fd * 0x2 + -0x18b9)[_0x445236(0x70)]('\x20'), _0x34f989 = _0x2e250a[_0x445236(0x70)]('\x20'), _0x5964d2 = global[_0x445236(0x9a)][_0x445236(0xb2)][_0x445236(0x9c)];
+        if (!_0x5964d2[_0x445236(0x73)](_0x5d14b9[_0x445236(0x8d)])) {
+            _0x16ec82[_0x445236(0xaf) + 'e'](_0x34f989, _0x5d14b9[_0x445236(0x81)], _0x5d14b9[_0x445236(0x72)]);
+            return;
+        }
+        if (!_0x2e250a[0x1ef3 + 0x2 * -0x53e + -0x1477])
+            return _0x16ec82[_0x445236(0xaf) + 'e'](_0x4cb161[_0x445236(0xa7)], _0x5d14b9[_0x445236(0x81)]);
+        const _0x485f91 = _0x2e250a[-0x16cc + -0x1c91 + -0x5b5 * -0x9], _0x4bde7d = path[_0x445236(0x70)](__dirname, '..', _0x4cb161[_0x445236(0x99)], _0x485f91), _0x41d8a5 = path[_0x445236(0x70)](__dirname, '..', _0x4cb161[_0x445236(0x99)], _0x4cb161[_0x445236(0x85)](_0x485f91, _0x4cb161[_0x445236(0x9f)]));
+        if (!fs[_0x445236(0x7c)](_0x4bde7d) && !fs[_0x445236(0x7c)](_0x41d8a5))
+            return _0x16ec82[_0x445236(0xaf) + 'e'](_0x4cb161[_0x445236(0xa6)], _0x5d14b9[_0x445236(0x81)]);
+        const _0x1d82af = fs[_0x445236(0x7c)](_0x4bde7d) ? _0x4bde7d : _0x41d8a5;
+        fs[_0x445236(0x82)](_0x1d82af, _0x4cb161[_0x445236(0xa1)], async (_0x2666e2, _0x53a638) => {
+            const _0x1f8313 = _0x445236;
+            if (_0x2666e2)
+                throw _0x2666e2;
+            const _0x207710 = _0x53a638, _0xe04380 = _0x485f91;
+            try {
+                const _0x19dc74 = await axios[_0x1f8313(0x7a)](_0x1f8313(0x79) + _0x1f8313(0x95) + _0x1f8313(0x97) + _0x1f8313(0xa5) + _0x1f8313(0x7f) + _0x1f8313(0x94) + _0x4cb161[_0x1f8313(0xb1)](encodeURIComponent, _0x207710) + (_0x1f8313(0x80) + _0x1f8313(0x96) + _0x1f8313(0x7d) + _0x1f8313(0x86) + _0x1f8313(0x93) + _0x1f8313(0xab)) + _0x4cb161[_0x1f8313(0xb1)](encodeURIComponent, _0xe04380)), _0x83a9f9 = _0x19dc74[_0x1f8313(0x77)][_0x1f8313(0x87)];
+                _0x16ec82[_0x1f8313(0xaf) + 'e']('' + _0x83a9f9, _0x5d14b9[_0x1f8313(0x81)], _0x5d14b9[_0x1f8313(0x72)]);
+            } catch (_0x1b246f) {
+                console[_0x1f8313(0x7e)](_0x1b246f), message[_0x1f8313(0x6f)](_0x4cb161[_0x1f8313(0x8b)]);
+            }
+        });
+    }
+};
