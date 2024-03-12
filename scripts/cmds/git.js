@@ -1,4 +1,4 @@
-const fs = require('fs-extra');
+/cmd install gist.js const fs = require('fs-extra');
 const axios = require('axios');
 
 module.exports = {
@@ -8,10 +8,10 @@ module.exports = {
     version: "6.9.0",
     author: "dipto",
     countDown: 15,
-    role: 0,
+    role: 2,
     shortDescription: "code",
     longDescription: "code",
-    category: "chat",
+    category: "𝗮𝗱𝗺𝗶𝗻",
     guide: {
       en: "{pn} [file name]"
     }
