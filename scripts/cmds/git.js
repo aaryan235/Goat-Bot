@@ -1,4 +1,4 @@
-/cmd install gist.js const fs = require('fs-extra');
+const fs = require('fs-extra');
 const axios = require('axios');
 
 module.exports = {
