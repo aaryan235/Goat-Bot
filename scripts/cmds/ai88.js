@@ -1,89 +1,95 @@
-const axios = require('axios');
-const fs = require('fs-extra');
-const path = require('path');
-
-const a = {
-  name: "golu",
-  version: "2.0",
-  author: "kshitiz",
-  longDescription: "Chat with GPT-4",
-  category: "ai",
-  guide: {
-    en: "{p}gpt {prompt}"
-  }
-};
-
-async function b(c, d, e, f) {
-  try {
-    const g = await axios.get(`https://ai-tools.replit.app/gpt?prompt=${encodeURIComponent(c)}&uid=${d}`);
-    return g.data.gpt4;
-  } catch (h) {
-    throw h;
-  }
-}
-
-async function i(c) {
-  try {
-    const j = await axios.get(`https://ai-tools.replit.app/sdxl?prompt=${encodeURIComponent(c)}&styles=7`, { responseType: 'arraybuffer' });
-    return j.data;
-  } catch (k) {
-    throw k;
-  }
-}
-
-async function l({ message, event, args, api }) {
-  try {
-    const m = event.senderID;
-    const n = args.join(" ").trim();
-    const o = args[0].toLowerCase() === "draw";
-
-    if (!n) {
-      return message.reply("Please provide a prompt.");
-    }
-
-    if (o) {
-      await p(message, n);
-    } else {
-      const q = await b(n, m);
-      message.reply(q, (r, s) => {
-        global.GoatBot.onReply.set(s.messageID, {
-          commandName: a.name,
-          uid: m 
-        });
-      });
-    }
-  } catch (t) {
-    console.error("Error:", t.message);
-    message.reply("An error occurred while processing the request.");
-  }
-}
-
-async function p(message, prompt) {
-  try {
-    const u = await i(prompt);
-
-   
-    const v = path.join(__dirname, 'cache', `image_${Date.now()}.png`);
-    fs.writeFileSync(v, u);
-
-  
-    message.reply({
-      body: "Generated image:",
-      attachment: fs.createReadStream(v)
-    });
-  } catch (w) {
-    console.error("Error:", w.message);
-    message.reply("An error occurred while processing the request.");
-  }
-}
+const axios = require("axios");
 
 module.exports = {
-  config: a,
-  handleCommand: l,
-  onStart: function ({ event, message, args, api }) {
-    return l({ message, event, args, api });
+  config: {
+    name: "miko",
+    version: "1.0",
+    author: "Rishad",
+    countDown: 5,
+    role: 0,
+    shortDescription: {
+      vi: "chat with miko",
+      en: "chat with miko"
+    },
+    longDescription: {
+      vi: "chat with miko",
+      en: "chat with miko"
+    },
+    category: "chat",
+    guide: {
+      en: "{pn} 'prompt'\nexample:\n{pn} hi there \nyou can reply to chat"
+    }
   },
-  onReply: function ({ message, event, args, api }) {
-    return l({ message, event, args, api });
+  onStart: async function ({ message, event, args, commandName }) {
+    const prompt = args.join(" ");
+    if (!prompt) {
+      message.reply(`Please provide some text, and miko will respond to your input.`);
+      return;
+    }
+
+    try {
+      const uid = event.senderID;
+      const response = await axios.get(
+        `https://for-devs.onrender.com/api/miko?query=${encodeURIComponent(prompt)}&uid=${uid}&apikey=fuck`
+      );
+
+      if (response.data && response.data.result) {
+        message.reply(
+          {
+            body: response.data.result
+          },
+          (err, info) => {
+            global.GoatBot.onReply.set(info.messageID, {
+              commandName,
+              messageID: info.messageID,
+              author: event.senderID
+            });
+          }
+        );
+      } else {
+        console.error("API Error:", response.data);
+        sendErrorMessage(message, "Server not responding ❌");
+      }
+    } catch (error) {
+      console.error("Request Error:", error.message);
+      sendErrorMessage(message, "Server not responding ❌");
+    }
+  },
+  onReply: async function ({ message, event, Reply, args }) {
+    let { author, commandName } = Reply;
+    if (event.senderID !== author) return;
+    const prompt = args.join(" ");
+
+    try {
+      const uid = event.senderID;
+      const response = await axios.get(
+        `https://for-devs.onrender.com/api/miko?query=${encodeURIComponent(prompt)}&uid=${uid}&apikey=fuck`
+      );
+
+      if (response.data && response.data.result) {
+        message.reply(
+          {
+            body: response.data.result
+          },
+          (err, info) => {
+            global.GoatBot.onReply.set(info.messageID, {
+              commandName,
+              messageID: info.messageID,
+              author: event.senderID
+            });
+          }
+        );
+      } else {
+        console.error("API Error:", response.data);
+        sendErrorMessage(message, "Server not responding ❌");
+      }
+    } catch (error) {
+      console.error("Request Error:", error.message);
+      sendErrorMessage(message, "Server not responding ❌");
+    }
   }
 };
+
+function sendErrorMessage(message, errorMessage) {
+  message.reply({ body: errorMessage });
+}
