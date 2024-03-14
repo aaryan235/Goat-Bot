@@ -74,8 +74,8 @@ async function kshitiz(api, event, args, message) {
 }
 
 const a = {
-  name: "gpt",
-  aliases: ["chatgpt"],
+  name: "baby",
+  aliases: ["babes"],
   version: "3.0",
   author: "kshitiz",
   countDown: 5,
@@ -83,7 +83,7 @@ const a = {
   longDescription: "Chat with GPT-4",
   category: "ai",
   guide: {
-    en: "{p}gpt {prompt}"
+    en: "{p}baby {prompt}"
   }
 };
 
