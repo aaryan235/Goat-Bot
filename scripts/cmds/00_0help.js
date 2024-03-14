@@ -4,7 +4,7 @@ const config = require('../../config.json'); // Adjust the path as needed
 
 module.exports = {
   config: {
-    name: "help",
+    name: "helpfile",
     version: "1.0",
     author: "Cruizex",
     countDown: 0,
