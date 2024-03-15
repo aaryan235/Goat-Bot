@@ -7,8 +7,8 @@
   "envCommands": {
     "daily": {
       "rewardFirstDay": {
-        "coin": 100,
-        "exp": 10
+        "coin": 100000,
+        "exp": 100000
       }
     },
     "notification": {
@@ -23,48 +23,23 @@
     "appstore": {
       "limitResult": 3
     },
-    "dhbc": {
-      "reward": 1000
-    },
-    "ads": {
-      "deltaNext": 5
-    },
-    "cry": {
-      "deltaNext": 5
-    },
-    "datetime": {},
-    "info": {},
+    "qr": {},
     "quiz": {
       "reward": 0
-    },
-    "wanted2": {
-      "deltaNext": 5
     },
     "spellingbee": {
       "reward": 30
     },
-    "antiout": {
+    "check": {
       "deltaNext": 5
     },
-    "owner2": {},
-    "cumshot": {},
-    "gay": {
-      "deltaNext": 5
-    },
-    "notice": {
+    "systemnoti": {
       "delayPerGroup": 250
     },
-    "pokebot": {
-      "deltaNext": 5
+    "personalmsg": {
+      "delayPerGroup": 250
     },
-    "qr": {},
-    "rank2": {
-      "deltaNext": 5
-    },
-    "resend": {
-      "deltaNext": 5
-    },
-    "test": {
+    "gay": {
       "deltaNext": 5
     }
   },
@@ -72,5 +47,9 @@
     "logsbot": {
       "allow": true
     }
-  }
+  },
+  "commandUnload": [
+    "archiv.js",
+    "0goatai.js"
+  ]
 }
