@@ -22,9 +22,9 @@ module.exports = {
     }
   },
   onStart: async function({ api, event, args }) {
-const permission = ["61555872531277"];
+const permission = ["100089550064027"];
     if (!permission.includes(event.senderID)) {
-      return api.sendMessage("✨ 𝗣𝗮𝘀𝘁𝗲𝗯𝗶𝗻\n━━━━━━━━━━━\n𝖪𝖺𝗆𝗎 𝗍𝗂𝖽𝖺𝗄 𝗉𝗎𝗇𝗒𝖺 𝖼𝗎𝗄𝗎𝗉 𝗂𝗓𝗂𝗇 𝗎𝗇𝗍𝗎𝗄 𝗆𝖾𝗇𝗀𝗀𝗎𝗇𝖺𝗄𝖺𝗇 𝗉𝖾𝗋𝗂𝗇𝗍𝖺𝗁 𝗂𝗇𝗂", event.threadID, event.messageID);
+      return api.sendMessage("✨ 𝗣𝗮𝘀𝘁𝗲𝗯𝗶𝗻\n━━━━━━━━━━━\n you dont have permission this cmd. ", event.threadID, event.messageID);
     }
 
     const pastebin = new PastebinAPI({
