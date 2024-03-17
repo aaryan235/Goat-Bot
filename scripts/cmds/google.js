@@ -1,44 +1,51 @@
-const axios = require('axios');
-
 module.exports = {
- config: {
- name: "google",
- aliases: ["search", "g"],
- version: "2.0",
- author: "XyryllPanget",
- role: 0,
- shortDescription: {
- en: "Searches Google for a given query."
- },
- longDescription: {
- en: "This command searches Google for a given query and returns the top 5 results."
- },
- category: "utility",
- guide: {
- en: "To use this command, type !google <query>."
- }
- },
- onStart: async function ({ api, event, args }) {
- const query = args.join(' ');
- if (!query) {
- api.sendMessage("Please provide a search query.", event.threadID);
- return;
- }
- 
- const cx = "7514b16a62add47ae";
- const apiKey = "AIzaSyAqBaaYWktE14aDwDE8prVIbCH88zni12E";
- const url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${query}`;
- try {
- const response = await axios.get(url);
- const searchResults = response.data.items.slice(0, 5);
- let message = `Top 5 results for '${query}':\n`;
- searchResults.forEach((result, index) => {
- message += `${index + 1}. ${result.title}\n${result.link}\n`;
- });
- api.sendMessage(message, event.threadID);
- } catch (error) {
- console.error(error);
- api.sendMessage("An error occurred while searching Google.", event.threadID);
- }
- }
+  config: {
+    name: 'google-search',
+    aliases: ['google', 'search'],
+    version: '1.0',
+    author: 'Samir Œ',
+    shortDescription: 'Perform a Google search.',
+    longDescription: 'Performs a Google search and provides the top results.',
+    category: 'Utility',
+    guide: {
+      en: '{pn} [search query]',
+    },
+  },
+  onStart: async function ({ message, args }) {
+    try {
+      const searchQuery = args.join(' ');
+
+      if (!searchQuery) {
+        return message.reply('Please provide a search query.');
+      }
+
+      const googleSearchResult = await performGoogleSearch(searchQuery);
+
+      message.reply(googleSearchResult);
+    } catch (error) {
+      console.error(error);
+      message.reply('An error occurred during the Google search.');
+    }
+  },
 };
+
+async function performGoogleSearch(text) {
+  try {
+    const googleit = require('google-it');
+    const googleSearch = await googleit({ query: text });
+    let resText = `⚡️ Google Search Results ⚡️\n\n🔍 Search Term: ${text}\n\n`;
+
+    for (let num = 0; num < Math.min(5, googleSearch.length); num++) {
+      resText += `📍 Result ${num + 1}:\n\n📚 Title: ${
+        googleSearch[num].title
+      }\n\n🔍 Description: ${
+        googleSearch[num].snippet
+      }\n\n🌐 Link: [${googleSearch[num].link}](${googleSearch[num].link})\n\n`;
+    }
+
+    console.log(resText);
+    return resText;
+  } catch (error) {
+    console.error('Error during Google search:', error);
+  }
+}
