@@ -1,55 +1,32 @@
 {
-  "commandBanned": {},
-  "envGlobal": {
-    "weatherApiKey": "d7e795ae6a0d44aaa8abb1a0a7ac19e4",
-    "goatbotApikey": ""
-  },
-  "envCommands": {
-    "daily": {
-      "rewardFirstDay": {
-        "coin": 100000,
-        "exp": 100000
-      }
-    },
-    "notification": {
-      "delayPerGroup": 250
-    },
-    "rank": {
-      "deltaNext": 5
-    },
-    "rankup": {
-      "deltaNext": 5
-    },
-    "appstore": {
-      "limitResult": 3
-    },
-    "qr": {},
-    "quiz": {
-      "reward": 0
-    },
-    "spellingbee": {
-      "reward": 30
-    },
-    "check": {
-      "deltaNext": 5
-    },
-    "systemnoti": {
-      "delayPerGroup": 250
-    },
-    "personalmsg": {
-      "delayPerGroup": 250
-    },
-    "gay": {
-      "deltaNext": 5
-    }
-  },
-  "envEvents": {
-    "logsbot": {
-      "allow": true
-    }
-  },
-  "commandUnload": [
-    "archiv.js",
-    "0goatai.js"
-  ]
+	"commandBanned": {},
+	"envGlobal": {
+		"weatherApiKey": "d7e795ae6a0d44aaa8abb1a0a7ac19e4",
+		"goatbotApikey": ""
+	},
+	"envCommands": {
+		"daily": {
+			"rewardDay1": {
+				"coin": 100,
+				"exp": 10
+			}
+		},
+		"notification": {
+			"delayPerGroup": 250
+		},
+		"rank": {
+			"deltaNext": 5
+		},
+		"rankup": {
+			"deltaNext": 5
+		},
+		"appstore": {
+			"limitResult": 3
+		}
+	},
+	"envEvents": {
+		"logsbot": {
+			"allow": true
+		}
+	}
 }
