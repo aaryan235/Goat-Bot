@@ -4,7 +4,6 @@ const path = require('path');
 const ytdl = require("@neoxr/ytdl-core");
 const yts = require("yt-search");
 
-
 async function lado(api, event, args, message) {
   try {
     const songName = args.join(" ");
@@ -18,7 +17,7 @@ async function lado(api, event, args, message) {
     const video = searchResults.videos[0];
     const videoUrl = video.url;
     const stream = ytdl(videoUrl, { filter: "audioonly" });
-    const fileName = `music.mp3`;
+    const fileName = `music.mp3`; 
     const filePath = path.join(__dirname, "tmp", fileName);
 
     stream.pipe(fs.createWriteStream(filePath));
@@ -42,54 +41,61 @@ async function lado(api, event, args, message) {
   }
 }
 
-
 async function kshitiz(api, event, args, message) {
   try {
     const query = args.join(" ");
-    const response = await axios.get(`https://cc-project-apis-jonell-magallanes.onrender.com/api/tiktok/searchvideo?keywords=${query}`);
+    const searchResults = await yts(query);
 
-    if (response.data.code === 0 && response.data.data.videos.length > 0) {
-      const videoUrl = response.data.data.videos[0].play;
-      const videoFileName = `${response.data.data.videos[0].video_id}.mp4`;
-
-      const tempVideoPath = path.join(__dirname, "tmp", videoFileName);
-      const writer = fs.createWriteStream(tempVideoPath);
-
-      const videoResponse = await axios.get(videoUrl, { responseType: "stream" });
-      videoResponse.data.pipe(writer);
-
-      writer.on("finish", () => {
-        const videoStream = fs.createReadStream(tempVideoPath);
-        message.reply({ attachment: videoStream });
-        api.setMessageReaction("✅", event.messageID, () => {}, true);
-      });
-    } else {
-      message.reply(" no videos found for the given query.");
-      api.setMessageReaction("❌", event.messageID, () => {}, true);
+    if (!searchResults.videos.length) {
+      message.reply("No videos found for the given query.");
+      return;
     }
+
+    const video = searchResults.videos[0];
+    const videoUrl = video.url;
+    const stream = ytdl(videoUrl, { filter: "audioandvideo" }); 
+    const fileName = `music.mp4`;
+    const filePath = path.join(__dirname, "tmp", fileName);
+
+    stream.pipe(fs.createWriteStream(filePath));
+
+    stream.on('response', () => {
+      console.info('[DOWNLOADER]', 'Starting download now!');
+    });
+
+    stream.on('info', (info) => {
+      console.info('[DOWNLOADER]', `Downloading ${info.videoDetails.title} by ${info.videoDetails.author.name}`);
+    });
+
+    stream.on('end', () => {
+      const videoStream = fs.createReadStream(filePath);
+      message.reply({ attachment: videoStream });
+      api.setMessageReaction("✅", event.messageID, () => {}, true);
+    });
   } catch (error) {
     console.error(error);
     message.reply("Sorry, an error occurred while processing your request.");
   }
 }
 
+
 const a = {
-  name: "baby",
-  aliases: ["babes"],
+  name: "gpt",
+  aliases: ["chatgpt"],
   version: "3.0",
-  author: "kshitiz",
+  author: "vex_kshitiz",
   countDown: 5,
   role: 0,
   longDescription: "Chat with GPT-4",
   category: "ai",
   guide: {
-    en: "{p}baby {prompt}"
+    en: "{p}gpt {prompt}"
   }
 };
 
 async function b(c, d, e, f) {
   try {
-    const g = await axios.get(`https://ai-tools.replit.app/gpt?prompt=${encodeURIComponent(c)}&uid=${d}`);
+    const g = await axios.get(`https://ai-tools.replit.app/gpt?prompt=${encodeURIComponent(c)}&uid=${d}&apikey=kshitiz`);
     return g.data.gpt4;
   } catch (h) {
     throw h;
