@@ -4,30 +4,40 @@ module.exports = {
   config: {
     name: "imgur",
     version: "1.0",
-    author: "Aadi",//i just convert this command from mirai
+    author: "Aryan Chauhan",
     countDown: 5,
-    role: 0,
-    longDescription: {
-      en: "upload your video and photo to imgur"
+    role: 2,
+    shortDescription: {
+      en: "Upload image or video to Imgur"
     },
-    category: "𝗧𝗢𝗢𝗟𝗦",  
-    description: "convert image/video into Imgur link",
-    commandCategory: "tools",
-    usages: "reply [image, video]"
+    longDescription: {
+      en: "Upload image or video to Imgur by replying to photo or video"
+    },
+    category: "tools",
+    guide: {
+      en: "{p}imgur reply any videos or photos"
+    }
   },
 
   onStart: async function ({ api, event }) {
-    const dip = event.messageReply?.attachments[0]?.url;
-    if (!link2) {
-      return api.sendMessage('Please reply to an image or video.', event.threadID, event.messageID);
+    const link = event.messageReply?.attachments[0]?.url;
+    if (!link) {
+      return api.sendMessage('⛔ 𝐈𝐍𝐕𝐀𝐋𝐈𝐃 𝐔𝐒𝐄\n\n➪ Please reply to an image or video.', event.threadID, event.messageID);
     }
+
     try {
-      const res = await axios.get(`https://eurix-api.replit.app/imgur?link=${encodeURIComponent(link2)}`);
-      const link2 = res.data.data;
-         api.sendMessage(link2, event.threadID, event.messageID);
+      const res = await axios.get(`https://aryans-apis-hub.onrender.com/api/imgur?link=${encodeURIComponent(link)}`);
+      const uploaded = res.data;
+
+      if (uploaded.status === "success") {
+        return api.sendMessage(`👑 𝗖𝗠𝗗 𝗦𝗬𝗦𝗧𝗘𝗠\n\n✨ 𝐈𝐦𝐠𝐮𝐫 𝐋𝐢𝐧𝐤\n➪ ${uploaded.url}`, event.threadID,
+event.messageID);
+      } else {
+        return api.sendMessage('Failed to upload image or video to Imgur.', event.threadID, event.messageID);
+      }
     } catch (error) {
       console.error(error);
-      return api.sendMessage('Failed to convert image or video into link.', event.threadID, event.messageID);
+      return api.sendMessage('Failed to upload image or video to Imgur.', event.threadID, event.messageID);
     }
   }
 };
