@@ -27,7 +27,7 @@ module.exports = {
 
     try {
       const res = await axios.get(`https://aryans-apis-hub.onrender.com/api/imgur?link=${encodeURIComponent(link)}`);
-      const uploaded = res.data;
+      const uploaded = res.data.uploaded;
 
       if (uploaded.status === "success") {
         return api.sendMessage(`👑 𝗖𝗠𝗗 𝗦𝗬𝗦𝗧𝗘𝗠\n\n✨ 𝐈𝐦𝐠𝐮𝐫 𝐋𝐢𝐧𝐤\n➪ ${uploaded.url}`, event.threadID,
