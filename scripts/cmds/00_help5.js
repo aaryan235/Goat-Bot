@@ -7,7 +7,7 @@ const doNotDelete = "[ 🐐 | GoatBot V2 ]";
 
 module.exports = {
 	config: {
-		name: "help5",
+		name: "help",
 		version: "1.17",
 		author: "NTKhang", // orginal author Kshitiz
 		countDown: 5,
@@ -104,9 +104,6 @@ module.exports = {
 	│ Author: ${author}
 	├── Usage
 	│ ${usage}
-	├── Notes
-	│ The content inside <XXXXX> can be changed
-	│ The content inside [a|b|c] is a or b or c
 	╰━━━━━━━❖`;
 
 				await message.reply(response);
