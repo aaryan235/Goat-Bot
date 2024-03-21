@@ -34,7 +34,7 @@ module.exports = {
       }
 
 
-      const response = await axios.get(`https://AryanAPI.replit.app/gpt?prompt=${encodeURIComponent(prompt)}`);
+      const response = await axios.get(`https://aryans-api-hub.onrender.com/gpt?prompt=${encodeURIComponent(prompt)}`);
       const answer = response.data.answer;
 
  
