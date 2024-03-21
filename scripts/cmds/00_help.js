@@ -12,7 +12,7 @@ const doNotDelete = "🇵🇭|𝗬𝗔𝗭𝗞𝗬 𝗔𝗜";
 
 module.exports = {
 	config: {
-		name: "help",
+		name: "help5",
 		version: "1.17",
 		author: "Aesther",
 		countDown: 5,
