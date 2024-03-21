@@ -1,70 +1,70 @@
 const axios = require("axios");
+const fs = require("fs-extra");
 const path = require("path");
-
-/*Do not change
-        the credit 🐢👑*/
 
 module.exports = {
   config: {
     name: "pinterest",
     aliases: ["pin"],
-    version: "1.0",
-    author: "rehat--",
+    version: "1.0.2",
+    author: "JVB",
     role: 0,
-    countDown: 60,
+    countDown: 50,
+    shortDescription: {
+      en: "Search for images on Pinterest"
+    },
     longDescription: {
-  en: "This command allows you to search for images on pinterest based on a given query and fetch a specified number of images."
-},
-    category: "Search",
+      en: ""
+    },
+    category: "image",
     guide: {
-      en: "{pn} <search query> <number of images>\nExample: {pn} tomozaki -5"
+      en: "{prefix}pinterest <search query> -<number of images>"
     }
   },
 
-  onStart: async function ({ api, event, args }) {
+  onStart: async function ({ api, event, args, usersData }) {
     try {
-      const fs = require("fs-extra");
+      const userID = event.senderID;
+
       const keySearch = args.join(" ");
       if (!keySearch.includes("-")) {
-        return api.sendMessage(
-          "Please enter the search query and number of images (1-4)",
-          event.threadID,
-          event.messageID
-        );
+        return api.sendMessage(`Please enter the search query and number of images to return in the format: ${this.config.guide.en}`, event.threadID, event.messageID);
       }
-      const keySearchs = keySearch.substr(0, keySearch.indexOf('-'))
-      let numberSearch = keySearch.split("-").pop() || 6
-    if (numberSearch> 4 ){
-      numberSearch = 4
-    }
+      const keySearchs = keySearch.substr(0, keySearch.indexOf('-')).trim();
+      const numberSearch = parseInt(keySearch.split("-").pop().trim()) || 6;
 
-      const apiUrl = `https://turtle-apis.onrender.com/api/pinterest?search=${encodeURIComponent(keySearchs)}&keysearch=${numberSearch}`;
+      const res = await axios.get(`https://celestial-dainsleif-v2.onrender.com/pinterest?pinte=${encodeURIComponent(keySearchs)}`);
+      const data = res.data;
 
-      const res = await axios.get(apiUrl);
-      const data = res.data.images;
+      if (!data || !Array.isArray(data) || data.length === 0) {
+        return api.sendMessage(`No image data found for "${keySearchs}". Please try another search query.`, event.threadID, event.messageID);
+      }
+
       const imgData = [];
 
       for (let i = 0; i < Math.min(numberSearch, data.length); i++) {
-        const imgResponse = await axios.get(data[i], {
-          responseType: "arraybuffer"
-        });
-        const imgPath = path.join(__dirname, "cache", `${i + 1}.jpg`);
-        await fs.outputFile(imgPath, imgResponse.data);
-        imgData.push(fs.createReadStream(imgPath));
+        const imageUrl = data[i].image;
+
+        try {
+          const imgResponse = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+          const imgPath = path.join(__dirname, 'cache', `${i + 1}.jpg`);
+          await fs.outputFile(imgPath, imgResponse.data);
+          imgData.push(fs.createReadStream(imgPath));
+        } catch (error) {
+          console.error(error);
+          // Handle image fetching errors (skip the problematic image)
+        }
       }
 
       await api.sendMessage({
         attachment: imgData,
+        body: `Here are the top ${imgData.length} image results for "${keySearchs}":`
       }, event.threadID, event.messageID);
 
-      await fs.remove(path.join(__dirname, "cache"));
+      await fs.remove(path.join(__dirname, 'cache'));
     } catch (error) {
       console.error(error);
-      return api.sendMessage(
-        `An error occurred.`,
-        event.threadID,
-        event.messageID
-      );
+      return api.sendMessage(`An error occurred. Please try again later.`, event.threadID, event.messageID);
     }
   }
 };
