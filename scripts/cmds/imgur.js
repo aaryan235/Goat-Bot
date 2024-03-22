@@ -4,40 +4,32 @@ module.exports = {
   config: {
     name: "imgur",
     version: "1.0",
-    author: "Aryan Chauhan",
+    author: "𝐀𝐒𝐈𝐅 𝐱𝟔𝟗",
     countDown: 5,
-    role: 2,
-    shortDescription: {
-      en: "Upload image or video to Imgur"
-    },
-    longDescription: {
-      en: "Upload image or video to Imgur by replying to photo or video"
-    },
-    category: "tools",
+    role: 0,
+    longDescription: "Imgur link",
+    category: "image",
     guide: {
-      en: "{p}imgur reply any videos or photos"
+      en: "{n} reply to image"
     }
   },
 
-  onStart: async function ({ api, event }) {
-    const link = event.messageReply?.attachments[0]?.url;
-    if (!link) {
-      return api.sendMessage('⛔ 𝐈𝐍𝐕𝐀𝐋𝐈𝐃 𝐔𝐒𝐄\n\n➪ Please reply to an image or video.', event.threadID, event.messageID);
-    }
-
+  onStart: async function(){},
+  onChat: async function({ message, event, args, commandName, api, usersData}) {
+       
+    const input = event.body;
+          if(input && input.trim().toLowerCase().startsWith('imgurl') || input && input.trim().toLowerCase().startsWith('imgur')){
+           const data = input.split(" ");
+           data.shift();
+    const link = event.messageReply?.attachments[0]?.url || data.join(" ");
     try {
-      const res = await axios.get(`https://aryans-apis-hub.onrender.com/api/imgur?link=${encodeURIComponent(link)}`);
-      const uploaded = res.data.uploaded;
-
-      if (uploaded.status === "success") {
-        return api.sendMessage(`👑 𝗖𝗠𝗗 𝗦𝗬𝗦𝗧𝗘𝗠\n\n✨ 𝐈𝐦𝐠𝐮𝐫 𝐋𝐢𝐧𝐤\n➪ ${uploaded.url}`, event.threadID,
-event.messageID);
-      } else {
-        return api.sendMessage('Failed to upload image or video to Imgur.', event.threadID, event.messageID);
-      }
+        const response = await axios.get(`https://noobs-apihouse.onrender.com/dipto/imgur?url=${encodeURIComponent(link)}`);
+      const imgurLink = response.data.data;
+      return message.reply(imgurLink);
     } catch (error) {
       console.error(error);
-      return api.sendMessage('Failed to upload image or video to Imgur.', event.threadID, event.messageID);
+      return message.reply(error);
     }
+  }
   }
 };
