@@ -80,7 +80,7 @@ async function kshitiz(api, event, args, message) {
 
 
 const a = {
-  name: "gpt",
+  name: "baby",
   aliases: ["chatgpt"],
   version: "3.0",
   author: "vex_kshitiz",
