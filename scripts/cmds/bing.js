@@ -28,7 +28,7 @@ module.exports = {
       const encodedPrompt = encodeURIComponent(prompt);
       const Key = "rubish69";
       const cookies = [
-"1yziHInUQF5BGvV6n4fDdTE5ecsQIIIKZKiyzyJsnMI4PMQjko3VMr5iz5ZOYIIhW7bY3xjIbS7puhT5uZQ-sozWAu2coHN_IFNtHxVia9mfGZOAl7OdYk5z6nU4kOziQ52Nckd5AJkEnr-0rv5DiFqn_SmaZfaNkMh2Lo2QBj34_RyP4a29vyeybt2uYlUBINNG28hW4uJs7kjnmOhsr7g"
+"1aJ5VEyvMZ-py3JXTaqDz0yXEd7p9N9Q66ODaSkC_nfdb1HKL0UOe2k6oXm5M12xh0336EtnzYkgHfb81JW-2KSuAnrlVaO5KGoCIbhc79xw7wEdO3m8xiSTDzNcGqUki8M_jhWiDsCFPvyB2mvSVBZPII_6D4ENqazFkg4xc5nY_ihOmkmaAUGiP8TjGXJDAeFSmothW6pt--M_pjpJVCA"
 ]; 
 
       const randomCookie = cookies[Math.floor(Math.random() * cookies.length)];
