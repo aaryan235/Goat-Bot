@@ -27,7 +27,7 @@ module.exports = {
     }
  
     try {
-      const apiUrl = `https://api-samir.onrender.com/stalk/insta?username=${username}`;
+      const apiUrl = `https://apis-samir.onrender.com/stalk/insta?username=${username}`;
       const { data } = await axios.get(apiUrl);
       const { user_info } = data;
  
