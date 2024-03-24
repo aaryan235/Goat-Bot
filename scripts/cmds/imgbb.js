@@ -22,7 +22,7 @@ module.exports = {
 
       const imageUrl = attachments[0].url;
 
-      const uploadUrl = 'https://api-samir.onrender.com/upload';
+      const uploadUrl = 'https://apis-samir.onrender.com/upload';
       const data = { file: imageUrl };
 
       const response = await fetch(uploadUrl, {
