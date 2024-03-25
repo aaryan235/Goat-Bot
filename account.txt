@@ -1,6 +1,6 @@
 [
     {
-        "key": "dbln", 
+        "key": "dbln",
         "value": "%7B%2261556457344791%22%3A%22bKlDeIHQ%22%2C%22100089332779568%22%3A%22FRrZqWjY%22%7D",
         "domain": "facebook.com",
         "path": "/login/device-based/",
