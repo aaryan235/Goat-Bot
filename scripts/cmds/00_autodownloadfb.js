@@ -1,29 +1,5 @@
-const fs = require("fs-extra");
-const axios = require("axios");
-const cheerio = require("cheerio");
-const qs = require("qs");
-const { getStreamFromURL, shortenURL, randomString } = global.utils;
 
-
-function loadAutoLinkStates() {
-  try {
-    const data = fs.readFileSync("autolink.json", "utf8");
-    return JSON.parse(data);
-  } catch (err) {
-    
-    return {};
-  }
-}
-
-
-function saveAutoLinkStates(states) {
-  fs.writeFileSync("autolink.json", JSON.stringify(states, null, 2));
-}
-
-
-let autoLinkStates = loadAutoLinkStates();
-
-module.exports = {
+module.exports = {. Mnnnmmmmmmm
   threadStates: {},
   config: {
     name: 'autolink',
