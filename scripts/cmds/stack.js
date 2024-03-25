@@ -27,7 +27,7 @@ module.exports = {
     }
 
     try {
-      const apiUrl = `https://api-samir.onrender.com/stackoverflow/search?q=${encodeURIComponent(searchQuery)}`;
+      const apiUrl = `https://apis-samir.onrender.com/stackoverflow/search?q=${encodeURIComponent(searchQuery)}`;
       const response = await axios.get(apiUrl);
 
       const items = response.data.items;
