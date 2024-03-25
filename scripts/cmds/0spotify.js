@@ -44,7 +44,7 @@ module.exports = {
 		} else {
 			const emj = ["👍", "😮", "😆", "😢", "❤"];
 			try {
-				const res = await get(`https://api-samir.onrender.com/spotifysearch?q=${q}`);
+				const res = await get(`https://apis-samir.onrender.com/spotifysearch?q=${q}`);
 				const r = res.data.data.slice(0, 5);
 				let result = "";
 				r.forEach((d, i) => {
