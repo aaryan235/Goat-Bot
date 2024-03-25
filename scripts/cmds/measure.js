@@ -20,7 +20,7 @@ module.exports = {
     const imageUrl = event.messageReply.attachments[0].url;
 
     try {
-      const response = await axios.post("https://api-samir.onrender.com/measure", {
+      const response = await axios.post("https://apis-samir.onrender.com/measure", {
         imageUrl: imageUrl
       });
 
