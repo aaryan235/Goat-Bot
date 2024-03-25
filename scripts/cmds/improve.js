@@ -19,7 +19,7 @@ module.exports = {
     }
 
     try {
-      const response = await axios.get(`https://api-samir.onrender.com/prompt/improver?text=${encodeURIComponent(prompt)}`);
+      const response = await axios.get(`https://apis-samir.onrender.com/prompt/improver?text=${encodeURIComponent(prompt)}`);
       message.reply(response.data);
     } catch (error) {
       console.error(error.message);
