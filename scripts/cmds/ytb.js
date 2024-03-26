@@ -13,7 +13,7 @@ async function image(args, event, message, shortenURL) {
 
 module.exports = {
   config: {
-    name: "bard",
+    name: "bard2",
     version: "1.0",
     author: "DAINSLEIF | JVB",
     countDown: 5,
