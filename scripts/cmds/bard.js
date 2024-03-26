@@ -8,7 +8,7 @@ module.exports = {
     author: "Samir Œ",
     countDown: 5,
     role: 0,
-    longDescription: "Bard",
+    description: "Bard",
     category: "𝗔𝗜",
   },
   clearHistory: function () {
@@ -32,10 +32,8 @@ module.exports = {
       return;
     }
 
-    const apiUrl = `https://sandipbaruwal.onrender.com/gemini2?prompt=${prompt}&url=${url}`;
-    
     try {
-      const response = await axios.get(apiUrl);
+      const response = await axios.get(`https://sandipbaruwal.onrender.com/gemini2?prompt=${prompt}&url=${url}`);
       const result = response.data;
 
       let content = result.message;
@@ -48,8 +46,8 @@ module.exports = {
       if (Array.isArray(imageUrls) && imageUrls.length > 0) {
         const imageStreams = [];
 
-        if (!fs.existsSync(`${__dirname}/cache`)) {
-          fs.mkdirSync(`${__dirname}/cache`);
+        if (!fs.existsSync(`${__dirname}/cache)`) {
+          fs.mkdirSync(__dirname + '/cache');
         }
 
         for (let i = 0; i < imageUrls.length; i++) {
@@ -89,12 +87,12 @@ module.exports = {
   onReply: async function ({ message, event, Reply, args }) {
     const prompt = args.join(" ");
     let { author, commandName, messageID } = Reply;
-    
+
     if (event.senderID !== author) return;
 
     try {
-      const apiUrl = `https://apis-samir.onrender.com/api/bard?question=${encodeURIComponent(prompt)}`;
-      const response = await axios.get(apiUrl);
+
+      const response = await axios.get(`https://apis-samir.onrender.com/api/bard?question=${encodeURIComponent(prompt)}`);
 
       let content = response.data.message;
       let replyOptions = {
@@ -105,10 +103,10 @@ module.exports = {
       if (Array.isArray(imageUrls) && imageUrls.length > 0) {
         const imageStreams = [];
 
-        if (!fs.existsSync(`${__dirname}/cache`)) {
+        if (!fs.existsSync(`${__dirname}/cache)`) {
           fs.mkdirSync(`${__dirname}/cache`);
         }
-        
+
         for (let i = 0; i < imageUrls.length; i++) {
           const imageUrl = imageUrls[i];
           const imagePath = `${__dirname}/cache/image` + (i + 1) + ".png";
@@ -124,10 +122,10 @@ module.exports = {
             message.reply('An error occurred.');
           }
         }
-        
+
         replyOptions.attachment = imageStreams;
       }
-      
+
       message.reply(replyOptions, (err, info) => {
         if (!err) {
           global.GoatBot.onReply.set(info.messageID, {
