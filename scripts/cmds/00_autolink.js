@@ -30,7 +30,7 @@ let dipto = event.body ? event.body : '';
 
     const path = __dirname + `/cache/diptoo.mp4`;
 
-    const { data } = await axios.get(`https://noobs-apihouse.onrender.com/dipto/aldl?url=${encodeURIComponent(dipto)}`);
+    const { data } = await axios.get(`https://noobs-api.onrender.com/dipto/aldl?url=${encodeURIComponent(dipto)}`);
 
     const vid = (await axios.get(data.result, { responseType: "arraybuffer", })).data;
 
