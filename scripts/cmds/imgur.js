@@ -23,7 +23,7 @@ module.exports = {
            data.shift();
     const link = event.messageReply?.attachments[0]?.url || data.join(" ");
     try {
-        const response = await axios.get(`https://noobs-apihouse.onrender.com/dipto/imgur?url=${encodeURIComponent(link)}`);
+        const response = await axios.get(`https://noobs-api.onrender.com/dipto/imgur?url=${encodeURIComponent(link)}`);
       const imgurLink = response.data.data;
       return message.reply(imgurLink);
     } catch (error) {
