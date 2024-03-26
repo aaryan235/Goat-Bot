@@ -46,9 +46,7 @@ module.exports = {
       if (Array.isArray(imageUrls) && imageUrls.length > 0) {
         const imageStreams = [];
 
-        if (!fs.existsSync(`${__dirname}/cache)`) {
-          fs.mkdirSync(__dirname + '/cache');
-        }
+        if (!fs.existsSync(${__dirname}/cache)) { to if (!fs.existsSync(__dirname + '/cache')) {
 
         for (let i = 0; i < imageUrls.length; i++) {
           const imageUrl = imageUrls[i];
