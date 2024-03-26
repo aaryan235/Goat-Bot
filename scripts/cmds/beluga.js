@@ -21,7 +21,7 @@ module.exports.onReply = async function ({ api, event , args}) {
     if (isNaN(url)) {
       try {
         api.setMessageReaction("🐤", event.messageID, (err) => {}, true);
-        const response = await axios.get(`https://noobs-apihouse.onrender.com/dipto/genix?url=${encodeURIComponent(url)}&prompt=${encodeURIComponent(prompt)}&model=${mod}`);
+        const response = await axios.get(`https://noobs-api.onrender.com/dipto/genix?url=${encodeURIComponent(url)}&prompt=${encodeURIComponent(prompt)}&model=${mod}`);
         const data = response.data.data;
         await api.sendMessage({ 
           body: "Here's your photo", 
