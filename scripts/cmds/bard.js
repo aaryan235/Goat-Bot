@@ -26,13 +26,13 @@ module.exports = {
     if (event.type === "message_reply" && event.messageReply.attachments && event.messageReply.attachments[0].type === "photo") {
       const photo = encodeURIComponent(event.messageReply.attachments[0].url);
       const query = args.join(" ");
-      const url = `https://apis-samir.onrender.com/gemini-pro?text=${encodeURIComponent(query)}&url=${photo}`;
+      const url = `https://sandipbaruwal.onrender.com/gemini2? text=${encodeURIComponent(query)}&url=${photo}`;
       const response = await axios.get(url);
       message.reply(response.data);
       return;
     }
 
-    const apiUrl = `https://apis-samir.onrender.com/api/bard?question=${encodeURIComponent(prompt)}`;
+    const apiUrl = `https://sandipbaruwal.onrender.com/gemini2?prompt=${prompt}&url=${url}`;
     
     try {
       const response = await axios.get(apiUrl);
