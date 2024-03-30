@@ -1,121 +1,95 @@
-const axios = require("axios");
-const fs = require("fs");
-const os = require("os");
-const path = require("path");
+.cmd install music.js module.exports = {
+  config: {
+    name: "music",
+    version: "1.0",
+    author: "JARiF",
+    role: 0,
+    shortDescription: {
+      vi: "Tìm kiếm nhạc và nghe.",
+      en: "Search for music and listen."
+    },
+    longDescription: {
+      vi: "Lệnh `music` cho phép bạn tìm kiếm bản nhạc và nghe trực tiếp mà không cần trả lời bằng số.",
+      en: "The `music` command allows you to search for music and listen directly without replying with numbers."
+    },
+    category: "media",
+    guide: {
+      en: "{pn} <song name>"
+    }
+  },
+  
+  onStart: async function ({ api, event }) {
+    const axios = require("axios");
+    const fs = require("fs-extra");
+    const ytdl = require("ytdl-core");
+    const yts = require("yt-search");
 
-const sentVideos = [];
+    const input = event.body;
+    const text = input.substring(12);
+    const data = input.split(" ");
 
-module.exports = {
-	config: {
-		name: "mxm",
-		version: "1.0",
-		role: 0,
-		author: "𝗞𝘀𝗵𝗶𝘁𝗶𝘇",
-		shortDescription: "Send a random meme video",
-		longDescription: "Send a random meme video",
-		category: "𝗙𝗕𝗚𝗥𝗢𝗨𝗣",
-		dependencies: {
-			axios: "",
-		},
-	},
-	onStart: async function ({ api, event }) {
-		try {
-			const triggerMessageID = event.messageID;
-			const loadingMessage = await api.sendMessage(
-				"𝗣𝗿𝗼𝗰𝗲𝘀𝘀𝗶𝗻𝗴 𝘆𝗼𝘂𝗿 𝗿𝗲𝗾𝘂𝗲𝘀𝘁..|| ✅",
-				event.threadID
-			);
+    if (data.length < 2) {
+      return api.sendMessage("⚠️ | Please enter a music name.", event.threadID);
+    }
 
-			const groupIds = ["1544123312616479"];
-			const accessToken = "EAAD6V7os0gcBOx6n4Mq5OnOnfHzZAOWGxNTDLuSaMchEHh38KWg0aKRjrE8ZBrOKZA2TesFOD0siTtDQkqOhrj0IIdXZATghF7Dj2uHvQU1H8ZBVpK19rNk6NBFZAx0Hu9e7NUT3hLUpkA0leyChiFeGLv5rpG4C95CPWjpwcMwDDEULQVPnlCfHkMzPg0llCF8QZDZD";
-			const apiVersion = "v18.0";
+    data.shift();
+    const song = data.join(" ");
 
-			for (const groupId of groupIds) {
-				const groupUrl = `https://graph.facebook.com/${apiVersion}/${groupId}/feed?access_token=${accessToken}&fields=attachments{url,type},source`;
-				const response = await axios.get(groupUrl);
-				const posts = response.data.data || [];
-				const videos = posts
-					.filter((post) => post.source && typeof post.source === "string")
-					.map((post) => post.source);
+    try {
+      const searchingMessage = await api.sendMessage(`⏳ | Searching Music "${song}"`, event.threadID);
 
-				if (videos.length === 0) {
-					await api.sendMessage(
-						`No video links found in the group ${groupId}.`,
-						event.threadID,
-						loadingMessage.messageID
-					);
-				} else {
-					const unsentVideos = videos.filter(video => !sentVideos.includes(video));
+      const searchResults = await yts(song);
+      if (!searchResults.videos.length) {
+        await api.sendMessage("Error: Invalid request.", event.threadID);
+        await api.unsendMessage(searchingMessage.messageID);
+        return;
+      }
 
-					if (unsentVideos.length === 0) {
-						await api.sendMessage(
-							`All videos from the group ${groupId} have been sent before.`,
-							event.threadID,
-							loadingMessage.messageID
-						);
-					} else {
-						const randomVideo =
-							unsentVideos[Math.floor(Math.random() * unsentVideos.length)] + "&dl=1";
+      const video = searchResults.videos[0];
+      const videoUrl = video.url;
 
-						const tempDir = path.join(os.tmpdir(), "fb_videos");
-						if (!fs.existsSync(tempDir)) {
-							fs.mkdirSync(tempDir);
-						}
+      const stream = ytdl(videoUrl, { filter: "audioonly" });
 
-						const randomFileName = `video_${Date.now()}.mp4`;
+      const fileName = `music.mp3`;
+      const filePath = __dirname + `/tmp/${fileName}`;
 
-						const filePath = path.join(tempDir, randomFileName);
+      stream.pipe(fs.createWriteStream(filePath));
 
-						const videoResponse = await axios({
-							method: "GET",
-							url: randomVideo,
-							responseType: "stream",
-						});
+      stream.on('response', () => {
+        console.info('[DOWNLOADER]', 'Starting download now!');
+      });
 
-						videoResponse.data.pipe(fs.createWriteStream(filePath));
+      stream.on('info', (info) => {
+        console.info('[DOWNLOADER]', `Downloading ${info.videoDetails.title} by ${info.videoDetails.author.name}`);
+      });
 
-						videoResponse.data.on("end", async () => {
-							if (fs.existsSync(filePath)) {
-								await api.sendMessage(
-									{
-										body: `𝗥𝗮𝗻𝗱𝗼𝗺  𝘃𝗶𝗱𝗲𝗼 💐`,
-										attachment: fs.createReadStream(filePath),
-									},
-									event.threadID,
-									triggerMessageID
-								);
+      stream.on('end', async () => {
+        console.info('[DOWNLOADER] Downloaded');
 
-								sentVideos.push(randomVideo);
-							} else {
-								console.error("File does not exist:", filePath);
+        if (fs.statSync(filePath).size > 26214400) {
+          fs.unlinkSync(filePath);
+          await api.sendMessage('[ERR] The file could not be sent because it is larger than 25MB.', event.threadID);
+        } else {
+          const message = {
+            body: `
+♡ˍˍˍ𝐌𝐔𝐒𝐈𝐂 𝐅𝐎𝐔𝐍𝐃ˍˍˍ♡
 
-								await api.sendMessage(
-									"An error occurred while fetching the video. Please try again later.",
-									event.threadID,
-									loadingMessage.messageID
-								);
-							}
-						});
+➺ 𝐒𝐎𝐍𝐆 𝐓𝐈𝐓𝐋𝐄: ${video.title}
 
-						videoResponse.data.on("error", async (err) => {
-							console.error("Error during video download:", err);
+➺ 𝐀𝐑𝐓𝐈𝐒𝐓: ${video.author.name}
 
-							await api.sendMessage(
-								"An error occurred while fetching the video. Please try again later.",
-								event.threadID,
-								loadingMessage.messageID
-							);
-						});
-					}
-				}
-			}
-		} catch (error) {
-			console.error("[ERROR]", error);
+♡ˍˍˍˍ𝐀𝐀𝐃𝐈 𝐑𝐎𝐁𝐎𝐓ˍˍˍˍ♡`,
+            attachment: fs.createReadStream(filePath)
+          };
 
-			await api.sendMessage(
-				"An error occurred while fetching the video links.",
-				event.threadID
-			);
-		}
-	},
-};
+          await api.sendMessage(message, event.threadID);
+        }
+
+        await api.unsendMessage(searchingMessage.messageID);
+      });
+    } catch (error) {
+      console.error('[ERROR]', error);
+      await api.sendMessage('An error occurred while processing the command.', event.threadID);
+    }
+  }      
+}
