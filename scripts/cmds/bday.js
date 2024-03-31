@@ -16,12 +16,12 @@ module.exports = {
 	},
 
 	onStart: async function ({ event, api }) {
-		const t = Date.parse("november 18, 2023 00:00:00") - Date.parse(new Date());
+		const t = Date.parse("april 08, 2024 00:00:00") - Date.parse(new Date());
 		const seconds = Math.floor( (t/1000) % 60 );
 		const minutes = Math.floor( (t/1000/60) % 60 );
 		const hours = Math.floor( (t/(1000*60*60)) % 24 );
 		const days = Math.floor( t/(1000*60*60*24) );
 
-		return api.sendMessage(`「remaining days for my boss Loid Butter. 」\n» ${days} days ${hours} hours ${minutes} minutes ${seconds} seconds «`, event.threadID, event.messageID);
+		return api.sendMessage(`「remaining days for my boss Aadi Gupta 😘🎊. 」\n» ${days} days ${hours} hours ${minutes} minutes ${seconds} seconds «`, event.threadID, event.messageID);
 	}
 };
