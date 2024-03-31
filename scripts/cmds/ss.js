@@ -1,2 +1,83 @@
-module.exports={config:{name:'screenshot',aliases:['ss'],version:'1.2',author:'Samir Œ',shortDescription:'Send a screenshot photo from a URL.',longDescription:'Sends a screenshot photo from a specified URL.',category:'𝗨𝗧𝗜𝗟𝗜𝗧𝗬',guide:{en:'{pn} [URL] | [device]',},},onStart:async function({message,args}){try{const argString=args.join(' ');const[providedURL,device]=argString.split('|').map(arg=>arg.trim());if(!providedURL){return message.reply('Please provide a URL.')}
-const deviceMap={'1':'desktop','2':'tablet','3':'mobile',};const selectedDevice=device&&deviceMap[device]?deviceMap[device]:'mobile';const api=`https://api-samir.onrender.com/ssweb?url=${encodeURIComponent(providedURL)}&device=${selectedDevice}`;message.reply({attachment:await global.utils.getStreamFromURL(api),})}catch(error){console.error(error);message.reply('An error occurred while processing the screenshot command.')}},}
+const axios = require("axios");
+
+module.exports = {
+  config: {
+    name: "screenshot",
+    aliases: ["ss"],
+    author: "RUBISH",
+    version: "2.0",
+    cooldowns: 5,
+    role: 2,
+    shortDescription: {
+      en: "Capture a screenshot of a website by url"
+    },
+    longDescription: {
+      en: "This command enables you to capture a screenshot of a webpage by providing its URL."
+    },
+    category: "General",
+    guide: {
+      en: "{pn} <url> or reply an url"
+    }
+  },
+  onStart: async function ({ api, event, args, message }) {
+    let url;
+
+    const setReactionInProgress = () => {
+      api.setMessageReaction("⏳", event.messageID, (err) => {
+        if (err) console.error(err);
+      }, true);
+    };
+
+    const setReactionSuccess = () => {
+      api.setMessageReaction("✅", event.messageID, (err) => {
+        if (err) console.error(err);
+      }, true);
+    };
+
+    setReactionInProgress();
+
+    const extractUrl = (text) => {
+      const urlRegex = /(https?:\/\/[^\s]+)/g;
+      const urls = text.match(urlRegex);
+      return urls ? urls[0] : null;
+    };
+
+    if (event.type === "message_reply") {
+      const repliedText = event.messageReply.body;
+      url = extractUrl(repliedText);
+      if (!url) {
+        return message.reply("⭕ | The replied message does not contain a valid URL.");
+      }
+    } else if (event.type === "message_url" && event.messageURL) {
+      url = event.messageURL;
+    } else {
+      if (args.length === 0) {
+        return message.reply("⚠️ | Please provide or reply with a URL.");
+      }
+      url = args[0];
+    }
+
+    try {
+      const response = await axios.get(`https://screenshot-rubish.onrender.com/screenshot?url=${encodeURIComponent(url)}&apikey=rubish69`);
+
+      const { imageURL } = response.data;
+
+      const imageResponse = await axios.get(imageURL, { responseType: "stream" });
+
+      await message.reply({
+        body: `
+✅ | Screenshot Captured
+
+▣ URL ⇾ ${url}
+
+▣ Image URL ⇾ ${imageURL}`,
+        attachment: imageResponse.data
+      });
+
+      setReactionSuccess(); 
+
+    } catch (error) {
+      message.reply(`Error: ${error.message}`);
+    }
+  }
+};
