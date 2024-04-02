@@ -2,7 +2,7 @@ const axios = require('axios');
 
 module.exports = {
 	config: {
-		name: "ai",
+		name: "ask",
 		version: 2.0,
 		author: "OtinXSandip",
 		longDescription: "chatgpt",
