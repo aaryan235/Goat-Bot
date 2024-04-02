@@ -1,60 +1,63 @@
 const axios = require('axios');
 
-async function a(api, event, args, message) {
-  try {
-    const a = args.join(" ").trim();
-
-    if (!a) {
-      return message.reply("ex: {p} cmdName {your question} ");
-    }
-
-    const b = "you are zoro ai"; // the more better content you give the  best it became
-    const c = await d(a, b);
-
-    if (c.code === 2 && c.message === "success") {
-      message.reply(c.answer, (r, s) => {
-        global.GoatBot.onReply.set(s.messageID, {
-          commandName: module.exports.config.name,
-          uid: event.senderID 
-        });
-      });
-    } else {
-      message.reply("Please try again later.");
-    }
-  } catch (e) {
-    console.error("Error:", e);
-    message.reply("An error occurred while processing your request.");
-  }
-}
-
-async function d(a, b) {
-  try {
-    const d = await axios.get(`https://personal-ai-phi.vercel.app/kshitiz?prompt=${encodeURIComponent(a)}&content=${encodeURIComponent(b)}`);
-    return d.data;
-  } catch (f) {
-    console.error("Error from api", f.message);
-    throw f;
-  }
-}
+const Prefixes = [
+  'ai',
+  'AI',
+  'Ai'
+];
 
 module.exports = {
   config: {
-    name: "ai",// add your ai name here
-    version: "1.0",
-    author: "Vex_Kshitiz",
+    name: 'ai',
+    version: '2.6.2',
+    author: 'JV Barcenas | Shikaki', // do not change
     role: 0,
-    longDescription: "your ai description",// ai description
-    category: "ai",
+    category: 'ai',
+    shortDescription: {
+      en: 'Asks gemini AI for an answer.',
+    },
+    longDescription: {
+      en: 'Asks gemini AI for an answer based on the user prompt.',
+    },
     guide: {
-      en: "{p}cmdName [prompt]"// add guide based on your ai name
+      en: '{pn} [prompt]',
+    },
+  },
+  onStart: async function () {},
+  onChat: async function ({ api, event, args, message }) {
+    try {
+      const prefix = Prefixes.find((p) => event.body && event.body.toLowerCase().startsWith(p));
+
+      if (!prefix) {
+        return; 
+      }
+
+      const prompt = event.body.substring(prefix.length).trim();
+
+      if (prompt === '') {
+        await message.reply(
+          "Kindly provide the question at your convenience and I shall strive to deliver an effective response. Your satisfaction is my top priority."
+        );
+        return;
+      }
+
+      api.setMessageReaction("⌛", event.messageID, () => { }, true);
+
+      let updatedPrompt = `Follow as written: Mostly answer in 1 word or 1 sentene. For any affirmation to your answers only yes or no. Answer in 1-2 sentences for generic questions and longer for complex questions. Mostly stick to 1 sentences unless asked long answers. Now: ${prompt}`;
+
+      const response = await axios.get(`https://pi.aliestercrowley.com/api?prompt=${encodeURIComponent(updatedPrompt)}&uid=${event.senderID}`);
+
+      if (response.status !== 200 || !response.data) {
+        throw new Error('Invalid or missing response from API');
+      }
+
+      const messageText = response.data.response;
+
+      await message.reply(messageText);
+
+      api.setMessageReaction("✅", event.messageID, () => { }, true);
+    } catch (error) {
+      message.reply(`Failed to get answer: ${error.message}`);
     }
   },
-  
-  handleCommand: a,
-  onStart: function ({ api, message, event, args }) {
-    return a(api, event, args, message);
-  },
-  onReply: function ({ api, message, event, args }) {
-    return a(api, event, args, message);
-  }
 };
