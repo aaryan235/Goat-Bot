@@ -39,7 +39,7 @@ async function d(a, b) {
 
 module.exports = {
   config: {
-    name: "personal-ai",// add your ai name here
+    name: "ai",// add your ai name here
     version: "1.0",
     author: "Vex_Kshitiz",
     role: 0,
