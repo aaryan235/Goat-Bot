@@ -36,7 +36,7 @@ module.exports = {
 
       if (prompt === '') {
         await message.reply(
-          "Kindly provide the question at your convenience and I shall strive to deliver an effective response. Your satisfaction is my top priority."
+          "kyaa 🙄"
         );
         return;
       }
