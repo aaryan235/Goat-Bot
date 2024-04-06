@@ -21,7 +21,7 @@ Yo, my prefix is [ 𓆩 . 𓆪 ]\n
 ➥ .sing [song name] -> play your music
 ➥ .callad [message] -> report any problem encountered
 ➥ .help [command] -> information and usage of command\n\nHave fun using it enjoy!❤️\nBot Developer: https://www.facebook.com/100089550064027`,
- attachment: await global.utils.getStreamFromURL("https://i.imgur.com/jWoZtjO.gif")
+ attachment: await global.utils.getStreamFromURL("https://i.imgur.com/crqGUYY.gif")
  });
  }
  }
