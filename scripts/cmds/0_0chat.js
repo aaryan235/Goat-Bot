@@ -1,63 +1,117 @@
-const axios = require('axios');
+const fetch = require("node-fetch");
+const { getPrefix, getStreamFromURL } = global.utils;
 
-const Prefixes = [
-  'bot',
-  'AI',
-  'Ai'
-];
 
 module.exports = {
   config: {
-    name: 'ai',
-    version: '2.6.2',
-    author: 'JV Barcenas | Shikaki', // do not change
+    name: "deviceinfo",
+    version: "1.0",
+    author: "Rishad",
+    countDown: 15,
     role: 0,
-    category: 'ai',
     shortDescription: {
-      en: 'Asks gemini AI for an answer.',
+      en: "Get information about a device.",
     },
     longDescription: {
-      en: 'Asks gemini AI for an answer based on the user prompt.',
+      en: "Retrieve detailed information about the specified device.",
     },
+    category: "info",
     guide: {
-      en: '{pn} [prompt]',
+      en: "{pn}deviceinfo (device name)",
     },
   },
-  onStart: async function () {},
-  onChat: async function ({ api, event, args, message }) {
+  onStart: async function ({ api, args, event }) {
+    const search = args.join(" ");
+
+    if (!search) {
+      api.sendMessage("Please provide the name of the device you want to search for.", event.threadID);
+      return;
+    }
+
+    const searchUrl = `https://for-devs.onrender.com/api/deviceinfo/search?query=${encodeURIComponent(search)}&apikey=fuck`;
+
     try {
-      const prefix = Prefixes.find((p) => event.body && event.body.toLowerCase().startsWith(p));
+      const searchResponse = await fetch(searchUrl);
+      const searchResults = await searchResponse.json();
 
-      if (!prefix) {
-        return; 
-      }
-
-      const prompt = event.body.substring(prefix.length).trim();
-
-      if (prompt === '') {
-        await message.reply(
-          "kyaa 🙄"
-        );
+      if (searchResults.results.length === 0) {
+        api.sendMessage(`❌No results found for '${search}'. Please try again with a different device name.`, event.threadID);
         return;
       }
 
-      api.setMessageReaction("⌛", event.messageID, () => { }, true);
-
-      let updatedPrompt = `Follow as written: Mostly answer in 1 word or 1 sentene. For any affirmation to your answers only yes or no. Answer in 1-2 sentences for generic questions and longer for complex questions. Mostly stick to 1 sentences unless asked long answers. Now: ${prompt}`;
-
-      const response = await axios.get(`https://pi.aliestercrowley.com/api?prompt=${encodeURIComponent(updatedPrompt)}&uid=${event.senderID}`);
-
-      if (response.status !== 200 || !response.data) {
-        throw new Error('Invalid or missing response from API');
+      let replyMessage = "🔍 Search Results:\n\n";
+      for (let i = 0; i < searchResults.results.length; i++) {
+        const device = searchResults.results[i];
+        replyMessage += `${i + 1}. ${device.name}\n`;
       }
+      replyMessage += "\nReply with the number of the device you want to get info about.";
 
-      const messageText = response.data.response;
+      const reply = await api.sendMessage(replyMessage, event.threadID);
+      const replyMessageID = reply.messageID;
 
-      await message.reply(messageText);
-
-      api.setMessageReaction("✅", event.messageID, () => { }, true);
+      global.GoatBot.onReply.set(replyMessageID, {
+        commandName: "deviceinfo",
+        author: event.senderID,
+        messageID: replyMessageID,
+        results: searchResults.results,
+      });
     } catch (error) {
-      message.reply(`Failed to get answer: ${error.message}`);
+      console.error(error);
+      api.sendMessage("An error occurred while fetching device information.", event.threadID);
+    }
+  },
+  onReply: async function ({ api, event, Reply }) {
+    const { author, messageID, results } = Reply;
+
+    if (event.senderID !== author) return;
+
+    const selectedNumber = parseInt(event.body);
+
+    if (isNaN(selectedNumber) || selectedNumber <= 0 || selectedNumber > results.length) {
+      api.sendMessage("Invalid option selected. Please reply with a valid number.", event.threadID);
+      return;
+    }
+
+    const selectedDevice = results[selectedNumber - 1];
+    const url = selectedDevice.url;
+    const infoUrl = `https://for-devs.onrender.com/api/deviceinfo/info?url=${encodeURIComponent(url)}&apikey=fuck`;
+
+    try {
+      const infoResponse = await fetch(infoUrl);
+      const deviceInfo = await infoResponse.json();
+
+      if (deviceInfo.status === 200) {
+     let infoMessage = `📱Device: ${deviceInfo.result.title}\n`;
+        infoMessage += `📅 Release Date: ${deviceInfo.result.releaseDate}\n`;
+        infoMessage += `📏 Dimensions: ${deviceInfo.result.dimensions}\n`;
+        infoMessage += `📱 Type: ${deviceInfo.result.type}\n`;
+        infoMessage += `💾 Storage: ${deviceInfo.result.storage}\n`;
+        infoMessage += `🔍 Display Info: ${deviceInfo.result.displayInfo}\n`;
+        infoMessage += `📏 Display Inch: ${deviceInfo.result.displayInch}\n`;
+        infoMessage += `📷 Camera Pixel: ${deviceInfo.result.cameraPixel}\n`;
+        infoMessage += `🎥 Video Pixel: ${deviceInfo.result.videoPixel}\n`;
+        infoMessage += `🔒 RAM Size: ${deviceInfo.result.ramSize}\n`;
+        infoMessage += `🧰 Chipset Info: ${deviceInfo.result.chipsetInfo}\n`;
+        infoMessage += `🔋 Battery Type: ${deviceInfo.result.batteryType}\n`;
+        infoMessage += `🔌 Battery Brand: ${deviceInfo.result.batteryBrand}\n`;
+
+
+        const image = await getStreamFromURL(deviceInfo.result.thumbnailUrls[0]);
+
+
+        const msgSend = await api.sendMessage(
+          {
+            body: infoMessage,
+            attachment: image,
+          },
+          event.threadID
+        );
+      } else {
+        api.sendMessage("Sorry, the device information could not be retrieved.", event.threadID);
+      }
+    } catch (error) {
+      console.error(error);
+      api.sendMessage("An error occurred while fetching device information.", event.threadID);
     }
   },
 };
