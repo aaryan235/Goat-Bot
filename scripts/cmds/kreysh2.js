@@ -1,65 +1,54 @@
 const axios = require('axios');
 
+const Prefixes = [
+  'ai',
+  'anya',
+  'perfect',
+  '+ai',
+  'hi',
+  '.ai',
+  'ask',
+];
+
 module.exports = {
-	config: {
-		name: 'kreysh2',
-		aliases: ['bot/kreysh'],
-		version: '1.1',
-		author: 'Samir',
-		countDown: 5,
-		role: 0,
-		shortDescription: 'kreysh',
-		longDescription: 'Chat with kreysh',
-		category: 'funny',
-		guide: {
-			body: '   {pn} {{[on | off]}}: enable/disable kreysh'
-				+ '\n'
-				+ '\n   {pn} {{<word>}}: Quick chat with kreysh'
-				+ '\n   Example: {pn} {{hi}}'
-		}
-	},
+  config: {
+    name: "ask",
+    version: 1.0,
+    author: "OtinXSandip",
+    longDescription: "AI",
+    category: "ai",
+    guide: {
+      en: "{p} questions",
+    },
+  },
+  onStart: async function () {},
+  onChat: async function ({ api, event, args, message }) {
+    try {
 
-	onStart: async function ({ args, threadsData, message, event }) {
-		if (args[0] == 'on' || args[0] == 'off') {
-			await threadsData.set(event.threadID, args[0] == "on", "settings.kreysh");
-			return message.reply(`Already ${args[0] == "on" ? "on" : "off"} kreysh in your group`);
-		}
-		else if (args[0]) {
-			const yourMessage = args.join(" ");
-			try {
-				const responseMessage = await getMessage(yourMessage);
-				return message.reply(`${responseMessage}`);
-			}
-			catch (err) {
-				return message.reply("kreysh is busy, please try again later");
-			}
-		}
-	},
+      const prefix = Prefixes.find((p) => event.body && event.body.toLowerCase().startsWith(p));
+      if (!prefix) {
+        return; // Invalid prefix, ignore the command
+      }
+      const prompt = event.body.substring(prefix.length).trim();
+   if (!prompt) {
+        await message.reply("𝑨𝒏𝒚𝒂 𝒊𝒔 𝒉𝒆𝒓𝒆 𝒘𝒊𝒍𝒍 𝒚𝒐𝒖 𝒑𝒓𝒐𝒗𝒊𝒅𝒆 𝒎𝒆 𝒕𝒉𝒆 𝒒𝒖𝒆𝒔𝒕𝒊𝒐𝒏 𝒕𝒐 𝒔𝒐𝒍𝒗𝒆 𝒊𝒕 (•̀ᴗ•́)و");
+        return;
+      }
 
-	onChat: async ({ args, message, threadsData, event, isUserCallCommand }) => {
-		if (args.length > 1 && !isUserCallCommand && await threadsData.get(event.threadID, "settings.kreysh")) {
-			try {
-				const responseMessage = await getMessage(args.join(" "));
-				return message.reply(`${responseMessage}\n🐣 kreysh answer you!`);
-			}
-			catch (err) {
-				return message.reply("kreysh is busy, please try again later");
-			}
-		}
-	}
+
+      const response = await axios.get(`https://sandipbaruwal.onrender.com/gpt?prompt=${encodeURIComponent(prompt)}`);
+      const answer = response.data.answer;
+
+
+    await message.reply({ body: `𝑴𝑹 𝑷𝑬𝑹𝑭𝑬𝑪𝑻 𝑨𝑰
+______________________________  
+${answer}
+𝑩𝒐𝒕 𝒐𝒘𝒏𝒆𝒓 
+m.me/100087591006635`,
+});
+
+   } catch (error) {
+      console.error("Error:", error.message);
+    }
+  }
 };
-
-async function getMessage(yourMessage) {
-	const res = await axios.get(`https://api.simsimi.net/v2`, {
-		params: {
-			text: yourMessage,
-			lc: global.GoatBot.config.language == 'vi' ? 'vn' : 'en',
-			cf: false
-		}
-	});
-
-	if (res.status > 200)
-		throw new Error(res.data.success);
-
-	return res.data.success;
-}
