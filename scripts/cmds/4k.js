@@ -1,50 +1,52 @@
-const axios = require('axios');
+const a = require('axios');
 const tinyurl = require('tinyurl');
 
 module.exports = {
-	config: {
-		name: "4k",
-		aliases: ["4k", "remini"],
-		version: "1.0",
-		author: "JARiF",
-		countDown: 15,
-		role: 0,
-		longDescription: "Upscale your image.",
-		category: "image",
-		guide: {
-			en: "{pn} reply to an image"
-		}
-	},
+  config: {
+    name: "remini",
+    aliases: ["4k", "upscale"],
+    version: "1.0",
+    author: "JARiF",
+    countDown: 15,
+    role: 0,
+    longDescription: "Upscale your image.",
+    category: "𝗧𝗢𝗢𝗟'𝗦",
+    guide: {
+      en: "{pn} reply to an image"
+    }
+  },
 
-	onStart: async function ({ message, args, event, api }) {
-		const getImageUrl = () => {
-			if (event.type === "message_reply") {
-				const replyAttachment = event.messageReply.attachments[0];
-				if (["photo", "sticker"].includes(replyAttachment?.type)) {
-					return replyAttachment.url;
-				} else {
-					throw new Error("┐⁠(⁠￣⁠ヘ⁠￣⁠)⁠┌ | Must reply to an image.");
-				}
-			} else if (args[0]?.match(/(https?:\/\/.*\.(?:png|jpg|jpeg))/g) || null) {
-				return args[0];
-			} else {
-				throw new Error("(⁠┌⁠・⁠。⁠・⁠)⁠┌ | Reply to an image.");
-			}
-		};
+  onStart: async function ({ message, args, event, api }) {
+    let imageUrl;
 
-		try {
-			const imageUrl = await getImageUrl();
-			const shortUrl = await tinyurl.shorten(imageUrl);
+    if (event.type === "message_reply") {
+      const replyAttachment = event.messageReply.attachments[0];
 
-			message.reply("ƪ⁠(⁠‾⁠.⁠‾⁠“⁠)⁠┐ | Please wait...");
+      if (["photo", "sticker"].includes(replyAttachment?.type)) {
+        imageUrl = replyAttachment.url;
+      } else {
+        return api.sendMessage(
+          { body: "❌ | Reply must be an image." },
+          event.threadID
+        );
+      }
+    } else if (args[0]?.match(/(https?:\/\/.*\.(?:png|jpg|jpeg))/g)) {
+      imageUrl = args[0];
+    } else {
+      return api.sendMessage({ body: "❌ | Reply to an image." }, event.threadID);
+    }
 
-			const response = await axios.get(`https://www.api.vyturex.com/upscale?imageUrl=${shortUrl}`);
-			const resultUrl = response.data.resultUrl;
+    try {
+      const url = await tinyurl.shorten(imageUrl);
+      const k = await a.get(`https://www.api.vyturex.com/upscale?imageUrl=${url}`);
 
-			message.reply({ body: "<⁠(⁠￣⁠︶⁠￣⁠)⁠> | Image Enhanced.", attachment: await global.utils.getStreamFromURL(resultUrl) });
-		} catch (error) {
-			message.reply("┐⁠(⁠￣⁠ヘ⁠￣⁠)⁠┌ | Error: " + error.message);
-			// Log error for debugging: console.error(error);
-		}
-	}
+      message.reply("✅ | Please wait...");
+
+      const resultUrl = k.data.resultUrl;
+
+      message.reply({ body: "✅ | Image Upscaled.", attachment: await global.utils.getStreamFromURL(resultUrl) });
+    } catch (error) {
+      message.reply("❌ | Error: " + error.message);
+    }
+  }
 };
