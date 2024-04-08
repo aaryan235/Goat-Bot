@@ -1,52 +1,111 @@
-const a = require('axios');
-const tinyurl = require('tinyurl');
+const axios = require("axios");
+const fs = require("fs");
+const path = require("path");
+
+const TOD_JSON_PATH = path.join(__dirname, "tod.json");
+let lang = "question"; 
 
 module.exports = {
-	config: {
-		name: "upscaleai",
-		aliases: ["HD", "upscale"],
-		version: "1.0",
-		author: "JARiF",
-		countDown: 15,
-		role: 0,
-		longDescription: "Upscale your image.",
-		category: "utility",
-		guide: {
-			en: "{pn} reply to an image"
-		}
-	},
+    config: {
+        name: "tod",
+        version: "1.0",
+        author: "Vex_Kshitiz",
+        role: 0,
+        shortDescription: "play truth and dare game",
+        longDescription: "play truth and dare game supports many languages",
+        category: "game",
+        guide: {
+            en: "{p}tod [truth/dare] [lang/reset]",
+        },
+    },
 
-	onStart: async function ({ message, args, event, api }) {
-		let imageUrl;
+    onStart: async function ({ api, event }) {
+        const commandParts = event.body.split(' ');
+        const subCommand = commandParts[1];
+        const langCommand = commandParts[2];
+        const userID = event.senderID;
 
-		if (event.type === "message_reply") {
-			const replyAttachment = event.messageReply.attachments[0];
+        if (subCommand === "truth") {
+            await this.sendTruth(api, event, userID);
+        } else if (subCommand === "dare") {
+            await this.sendDare(api, event, userID);
+        } else if (subCommand === "lang") {
+            if (langCommand && langCommand !== "reset") {
+                if (this.isValidLanguage(langCommand)) {
+                    lang = langCommand;
+                    this.saveUserLang(userID, lang);
+                    await api.sendMessage(`Language set to ${langCommand}`, event.threadID, event.messageID);
+                } else {
+                    await api.sendMessage(`Language '${langCommand}' not available.\nAvailable languages are: bn, de, es, fr, hi, tl`, event.threadID, event.messageID);
+                }
+            } else if (langCommand === "reset") {
+                this.resetUserLang(userID);
+                await api.sendMessage(`Language reset to default`, event.threadID, event.messageID);
+            } else {
+                await api.sendMessage("Invalid language command.\nUse 'reset' to reset to the default language\nor provide a language code\n(e.g., 'bn' for Bengali)", event.threadID, event.messageID);
+            }
+        } else {
+            await api.sendMessage("Invalid command. ex: tod truth or tod dare\nto select language tod lang {lang}", event.threadID, event.messageID);
+        }
+    },
 
-			if (["photo", "sticker"].includes(replyAttachment?.type)) {
-				imageUrl = replyAttachment.url;
-			} else {
-				return api.sendMessage(
-					{ body: "❌ | Reply must be an image." },
-					event.threadID
-				);
-			}
-		} else if (args[0]?.match(/(https?:\/\/.*\.(?:png|jpg|jpeg))/g)) {
-			imageUrl = args[0];
-		} else {
-			return api.sendMessage({ body: "❌ | Reply to an image." }, event.threadID);
-		}
+    isValidLanguage: function(lang) {
+        const availableLanguages = ["bn", "de", "es", "fr", "hi", "tl"];
+        return availableLanguages.includes(lang);
+    },
 
-		try {
-			const url = await tinyurl.shorten(imageUrl);
-			const k = await a.get(`https://www.api.vyturex.com/upscale?imageUrl=${url}`);
+    saveUserLang: function(userID, lang) {
+        let userData = {};
+        if (fs.existsSync(TOD_JSON_PATH)) {
+            const data = fs.readFileSync(TOD_JSON_PATH, "utf8");
+            userData = JSON.parse(data);
+        }
+        userData[userID] = lang;
+        fs.writeFileSync(TOD_JSON_PATH, JSON.stringify(userData, null, 2));
+    },
 
-			message.reply("✅ | Please wait...");
+    getUserLang: function(userID) {
+        if (fs.existsSync(TOD_JSON_PATH)) {
+            const data = fs.readFileSync(TOD_JSON_PATH, "utf8");
+            const userData = JSON.parse(data);
+            return userData[userID];
+        }
+        return null;
+    },
 
-			const resultUrl = k.data.resultUrl;
+    resetUserLang: function(userID) {
+        let userData = {};
+        if (fs.existsSync(TOD_JSON_PATH)) {
+            const data = fs.readFileSync(TOD_JSON_PATH, "utf8");
+            userData = JSON.parse(data);
+        }
+        delete userData[userID];
+        fs.writeFileSync(TOD_JSON_PATH, JSON.stringify(userData, null, 2));
+    },
 
-			message.reply({ body: "✅ | Image Upscaled.", attachment: await global.utils.getStreamFromURL(resultUrl) });
-		} catch (error) {
-			message.reply("❌ | Error: " + error.message);
-		}
-	}
+    sendTruth: async function (api, event, userID) {
+        const lang = this.getUserLang(userID) || "question";
+        try {
+            const response = await axios.get("https://api.truthordarebot.xyz/v1/truth");
+            const question = response.data.translations[lang] || response.data.question;
+
+            await api.sendMessage(`${question}`, event.threadID, event.messageID);
+        } catch (error) {
+            console.error("Error fetching truth question:", error);
+            await api.sendMessage("Error fetching truth question", event.threadID, event.messageID);
+        }
+    },
+
+    sendDare: async function (api, event, userID) {
+        const lang = this.getUserLang(userID) || "question";
+        try {
+            const response = await axios.get("https://api.truthordarebot.xyz/v1/dare");
+            const question = response.data.translations[lang] || response.data.question;
+
+            await api.sendMessage(`${question}`, event.threadID, event.messageID);
+        } catch (error) {
+            console.error("Error fetching dare question:", error);
+            await api.sendMessage("Error fetching dare question", event.threadID, event.messageID);
+        }
+    },
 };
