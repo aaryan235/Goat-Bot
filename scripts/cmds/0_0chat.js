@@ -28,7 +28,7 @@ module.exports = {
       return;
     }
 
-    const searchUrl = `https://for-devs.onrender.com/api/deviceinfo/search?query=${encodeURIComponent(search)}&apikey=fuck`;
+    const searchUrl = `https://for-devs.onrender.com/api/deviceinfo/search?query=${encodeURIComponent(search)}&apikey=api1`;
 
     try {
       const searchResponse = await fetch(searchUrl);
@@ -74,7 +74,7 @@ module.exports = {
 
     const selectedDevice = results[selectedNumber - 1];
     const url = selectedDevice.url;
-    const infoUrl = `https://for-devs.onrender.com/api/deviceinfo/info?url=${encodeURIComponent(url)}&apikey=fuck`;
+    const infoUrl = `https://for-devs.onrender.com/api/deviceinfo/info?url=${encodeURIComponent(url)}&apikey=api1`;
 
     try {
       const infoResponse = await fetch(infoUrl);
