@@ -1,50 +1,91 @@
 const axios = require('axios');
 
-const bitlyToken = 'ee891aaa3d51db956a8e1c0bdc116cf2e7df839d';
+const Prefixes = [
+   'chuni',
+  '/bard',
+  'ask',
+  '.chi',
+  '露sammy',
+  '_nano',
+  'nano',
+  'ai',
+  '.ask',
+  '/ask',
+  '!ask',
+  '@ask',
+  '#ask',
+  '$ask',
+  '%ask',
+  '^ask',
+  '*ask',
+  '.ai',
+  '/ai',
+  '!ai',
+  '@ai',
+  '#ai',
+  '$ai',
+  '%ai',
+  '^ai',
+  '*ai',
+  '-ai',
+  '饾懆饾拪 '
+];
 
 module.exports = {
-config : {
-  name: "bit.ly",
-  version: "1.0.0",
-  author: "blake Cyphrus",
-longDescription: {
-en: "Shorten a link using Bitly"},
-  shortDescription: {
-en: "Shorten a link using Bitly"},
-  commandCategory: "general",
-  usages: "<link>",
-  countDowns: 10,
-  role: 0,
-},
+  config: {
+    name: 'ai',
+    version: '2.5',
+    author: 'JV Barcenas', // do not change
+    role: 0,
+    category: 'ai',
+    shortDescription: {
+      en: 'Asks an AI for an answer.',
+    },
+    longDescription: {
+      en: 'Asks an AI for an answer based on the user prompt.',
+    },
+    guide: {
+      en: '{pn} [prompt]',
+    },
+  },
+  onStart: async function () {},
+  onChat: async function ({ api, event, args, message }) {
+    try {
+      const prefix = Prefixes.find((p) => event.body && event.body.toLowerCase().startsWith(p));
 
-onStart : async function({ api, event, args }) {
-  if (args.length < 1) {
-    return api.sendMessage("Please provide a link to shorten.", event.threadID, event.messageID);
-  }
+      if (!prefix) {
+        return; 
+      }
 
-  const originalLink = args[0];
+      const prompt = event.body.substring(prefix.length).trim();
 
-  
-  api.sendMessage("⌛| Processing your request... Your link will be shortened in a few seconds. Please wait...", event.threadID);
+      if (prompt === '') {
+        await message.reply(
+          "My lord what's your question."
+        );
+        return;   
+      }
 
-  // Simulate a delay (10 seconds).
-  await new Promise((resolve) => setTimeout(resolve, 10000));
 
-  try {
-    const response = await axios.post('https://api-ssl.bitly.com/v4/shorten', {
-      long_url: originalLink,
-    }, {
-      headers: {
-        'Authorization': `Bearer ${bitlyToken}`,
-        'Content-Type': 'application/json',
-      },
-    });
+      await message.reply("Answering your question my Lord. Please wait a moment...");
 
-    const shortenedLink = response.data.link;
-    api.sendMessage(`✅ | 🔗 Shortened Link: \n\n ${shortenedLink}`, event.threadID);
-  } catch (error) {
-    console.error(error);
-    api.sendMessage("An error occurred while shortening the link. Please try again later.", event.threadID);
-  }
-},
+      const response = await axios.get(`https://api.easy-api.online/v1/globalgpt?q=${encodeURIComponent(prompt)}`);
+
+      if (response.status !== 200 || !response.data) {
+        throw new Error('Invalid or missing response from API');
+      }
+
+      const messageText = response.data.content.trim();
+
+      await message.reply(messageText);
+
+      console.log('Sent answer as a reply to user');
+    } catch (error) {
+      console.error(`Failed to get answer: ${error.message}`);
+      api.sendMessage(
+        `${error.message}.\n\nYou can try typing your question again or resending it, as there might be a bug from the server that's causing the problem. It might resolve the issue.`,
+        event.threadID
+      );
+    }
+  },
 };
