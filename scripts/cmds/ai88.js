@@ -92,4 +92,4 @@ module.exports = {
 
 function sendErrorMessage(message, errorMessage) {
   message.reply({ body: errorMessage });
-}
+                                       }
