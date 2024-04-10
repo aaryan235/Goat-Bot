@@ -29,7 +29,7 @@ module.exports = {
 
         const searchUrl = `https://for-devs.onrender.com/api/movie/search?query=${encodeURIComponent(
             movieName
-        )}&apikey=fuck`;
+        )}&apikey=api1`;
 
         try {
             const searchResponse = await fetch(searchUrl);
@@ -75,7 +75,7 @@ module.exports = {
     
         const selectedMovie = results[selectedNumber - 1];
         const searchID = selectedMovie.searchID;
-        const movieInfoUrl = `https://for-devs.onrender.com/api/movie/info?id=${searchID}&apikey=fuck`;
+        const movieInfoUrl = `https://for-devs.onrender.com/api/movie/info?id=${searchID}&apikey=api1`;
     
         try {
             const infoResponse = await fetch(movieInfoUrl);
