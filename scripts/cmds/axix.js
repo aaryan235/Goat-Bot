@@ -1,4 +1,4 @@
-const axios = require('axios');
+Cmd install bvvb const axios = require('axios');
 
 const PREFIXES = ["aadi", "flair"," claire"];
 
