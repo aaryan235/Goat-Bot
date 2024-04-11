@@ -1,3 +1,4 @@
+
 module.exports = {
   config: {
     name: "stalk2",
@@ -5,7 +6,7 @@ module.exports = {
     author: "Samir Œ",
     countDown: 5,
     role: 0,
-    shortDescription: "stalk2",
+    shortDescription: "stalk",
     longDescription: "multi stalk command",
     category: "𝗜𝗡𝗙𝗢",
   },  /**User interface designed by Mesbah Bb'e */
@@ -16,6 +17,9 @@ module.exports = {
       return event.senderID;
     }
   },
+
+global.api = { samirApi:"https://apis-samir.onrender.com" };
+
   getUserInfo: async (api, threadID, targetID) => {
     try {
       const data = await api.getUserInfo(targetID);
