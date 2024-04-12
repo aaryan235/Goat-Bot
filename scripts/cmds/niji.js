@@ -6,8 +6,8 @@ const { getStreamFromURL } = global.utils;
 
 module.exports = {
     config: {
-        name: "niji",
-        aliases: ["nijijourney"],
+        name: "nija",
+        aliases: ["nijaa"],
         version: "1.0",
         author: "SiAM | Rehat86",
         countDown: 5,
