@@ -31,7 +31,7 @@ module.exports = {
     try {
       const uid = event.senderID;
       const response = await axios.get(
-        `https://for-devs.onrender.com/api/gpt?query=${encodeURIComponent(prompt)}&uid=${uid}&jbprompt=${jb}&apikey=fuck`
+        `https://for-devs.onrender.com/api/gpt?query=${encodeURIComponent(prompt)}&uid=${uid}&jbprompt=${jb}&apikey=api1`
       );
 
       if (response.data && response.data.result) {
