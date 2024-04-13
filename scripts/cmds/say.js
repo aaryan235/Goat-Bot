@@ -1,57 +1,265 @@
-const { createReadStream, unlinkSync, createWriteStream } = require("fs-extra");
-const { resolve } = require("path");
-const axios = require("axios");
+const axios = require('axios');
 
 module.exports = {
-  config: {
-    name: "say",
-    aliases: ["bol"],
-    version: "1.1",
-    author: "otineeeeyyyyyyyy",
-    countDown: 5,
-    role: 0,
-    shortDescription: {
-      en: "text to speech with language",
-    },
-    longDescription: {
-      en: "text to speech language",
-    },
-    category: "fun",
-    guide: {
-      en: "/say [language] [text]: Convert text to speech. Default language is English.\nExample usages:\n/say hi\n/say ja こんにちは"
-    },
-  },
+	config: {
+		name: "say",
+		aliases: ["say"],
+		version: "1.0",
+		author: "@tas33n",
+		countDown: 5,
+		role: 0,
+		shortDescription: "say something",
+		longDescription: "the bot saying like google",
+		category: "fun",
+		guide: "{pn} {{<say>}}"
+	},
 
-  onStart: async function ({ api, event, args, getLang }) {
-    try {
-      const content = event.type === "message_reply" ? event.messageReply.body : args.join(" ");
-      const supportedLanguages = ["ru", "en", "ko", "ja", "tl", "vi", "in", "ne"];
-      const defaultLanguage = "en"; // Set the default language to "en"
-      const languageToSay = supportedLanguages.some((item) => content.indexOf(item) === 0) ? content.slice(0, content.indexOf(" ")) : defaultLanguage;
-      const msg = languageToSay !== defaultLanguage ? content.slice(3, content.length) : content;
-      const path = resolve(__dirname, "cache", `${event.threadID}_${event.senderID}.mp3`);
+	onStart: async function ({ api, message, args, event}) {
+    let lng = "en"
+    let say;
+		if(ln.includes(args[0])){
+      lng = args[0]
+      args.shift()
+      say = encodeURIComponent(args.join(" "))
+    } else{ say = args.join(" ")}
+			try {
+				let url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${lng}&client=tw-ob&q=${say}`
 
-      const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(msg)}&tl=${languageToSay}&client=tw-ob`;
-      const response = await axios({
-        method: "GET",
-        url,
-        responseType: "stream",
-      });
 
-      const writer = response.data.pipe(createWriteStream(path));
-      await new Promise((resolve, reject) => {
-        writer.on("finish", resolve);
-        writer.on("error", reject);
-      });
+        message.reply({body:"",
+				attachment: await global.utils.getStreamFromURL(url)
+                      })
+				
+					
+			} catch (e) {
+        console.log(e)
+        message.reply(`🥺 server busy `) }
 
-      api.sendMessage(
-        { attachment: createReadStream(path) },
-        event.threadID,
-        () => unlinkSync(path)
-      );
-    } catch (error) {
-      console.error("Error occurred during TTS:", error);
-      // Handle error response here, e.g., send an error message to the user
-    }
-  },
+	}
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const ln = [
+  "ab",
+  "aa",
+  "af",
+  "ak",
+  "sq",
+  "am",
+  "ar",
+  "an",
+  "hy",
+  "as",
+  "av",
+  "ae",
+  "ay",
+  "az",
+  "bm",
+  "ba",
+  "eu",
+  "be",
+  "bn",
+  "bh",
+  "bi",
+  "bs",
+  "br",
+  "bg",
+  "my",
+  "ca",
+  "km",
+  "ch",
+  "ce",
+  "ny",
+  "zh",
+  "cu",
+  "cv",
+  "kw",
+  "co",
+  "cr",
+  "hr",
+  "cs",
+  "da",
+  "dv",
+  "nl",
+  "dz",
+  "en",
+  "eo",
+  "et",
+  "ee",
+  "fo",
+  "fj",
+  "fi",
+  "fr",
+  "ff",
+  "gd",
+  "gl",
+  "lg",
+  "ka",
+  "de",
+  "ki",
+  "el",
+  "kl",
+  "gn",
+  "gu",
+  "ht",
+  "ha",
+  "he",
+  "hz",
+  "hi",
+  "ho",
+  "hu",
+  "is",
+  "io",
+  "ig",
+  "id",
+  "ia",
+  "ie",
+  "iu",
+  "ik",
+  "ga",
+  "it",
+  "ja",
+  "jv",
+  "kn",
+  "kr",
+  "ks",
+  "kk",
+  "rw",
+  "kv",
+  "kg",
+  "ko",
+  "kj",
+  "ku",
+  "ky",
+  "lo",
+  "la",
+  "lv",
+  "lb",
+  "li",
+  "ln",
+  "lt",
+  "lu",
+  "mk",
+  "mg",
+  "ms",
+  "ml",
+  "mt",
+  "gv",
+  "mi",
+  "mr",
+  "mh",
+  "ro",
+  "mn",
+  "na",
+  "nv",
+  "nd",
+  "ng",
+  "ne",
+  "se",
+  "no",
+  "nb",
+  "nn",
+  "ii",
+  "oc",
+  "oj",
+  "or",
+  "om",
+  "os",
+  "pi",
+  "pa",
+  "ps",
+  "fa",
+  "pl",
+  "pt",
+  "qu",
+  "rm",
+  "rn",
+  "ru",
+  "sm",
+  "sg",
+  "sa",
+  "sc",
+  "sr",
+  "sn",
+  "sd",
+  "si",
+  "sk",
+  "sl",
+  "so",
+  "st",
+  "nr",
+  "es",
+  "su",
+  "sw",
+  "ss",
+  "sv",
+  "tl",
+  "ty",
+  "tg",
+  "ta",
+  "tt",
+  "te",
+  "th",
+  "bo",
+  "ti",
+  "to",
+  "ts",
+  "tn",
+  "tr",
+  "tk",
+  "tw",
+  "ug",
+  "uk",
+  "ur",
+  "uz",
+  "ve",
+  "vi",
+  "vo",
+  "wa",
+  "cy",
+  "fy",
+  "wo",
+  "xh",
+  "yi",
+  "yo",
+  "za",
+  "zu"
+]
