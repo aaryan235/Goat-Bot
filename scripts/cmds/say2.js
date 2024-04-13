@@ -1,40 +1,54 @@
-const axios = require("axios");
+const axios = require('axios');
+const supportedIds = ["rachel", "drew", "clyde", "paul", "domi", "dave", "fin", "sarah", "antoni", "thomas", "charlie", "george", "emily", "elli", "callum", "patrick", "harry", "liam", "dorothy", "josh", "arnold", "charlotte", "alice", "matilda", "matthew", "james", "joseph", "jeremy", "michael", "ethan", "chris", "gigi", "freya", "brian", "grace", "daniel", "lily", "serena", "adam", "nicole", "bill", "jessie", "sam", "glinda", "giovanni", "mimi"];
 
 module.exports = {
-	config: {
-		name: "say2",
-		version: "1.1",
-		author: "Otinxsandip",
-		countDown: 5,
-		role: 0,
-		longDescription: "voice",
-		category: "ai",
-		guide: {
-			en: "{pn} text or reply to text with models here are supported models \nFiliz\nLupe\nEwa\nJacek\nAstrid\nJan\nSalli\nCristiano\nInes\nCarmen\nMaxim\nTatyana\nGeraint\nMaja\nPenelope\nMiguel\nGwyneth\nIvy\nJoey\nMatthew\nKimberly\nKendra\nJustin\nJoanna\nSally\njoey\nEmma"
-		}
-	},
-	onStart: async function ({ message, api, args, event }) {
-		const text = event.type === 'message_reply' ? event.messageReply.body : args.join(' ');
+  config: {
+    name: "voice",
+    version: "1.0",
+    author: "Rishad",
+    countDown: 5,
+    role: 0,
+    category: "Fun",
+    ShortDescription: "Generate voice using AI",
+    LongDescription: "Generates voice using an AI.",
+    guide: {
+      en: "{pn} (voice id) | texts\nExample: {pn} rachel | hey there\n{pn} list | Get the list of supported voice IDs"
+    }
+  },
 
-		if (!text) {
-			return message.reply('Please type text or reply to text.');
-		}
+  onStart: async function ({ api, args, message, event }) {
+    const { getPrefix, getStreamFromURL } = global.utils;
+    const p = getPrefix(event.threadID);
 
-		const [lado, model] = args.join(" ").split('|').map((text) => text.trim());
-		const puti = model || "18";
-		const link = `https://sandipapi.onrender.com/speak?text=${text}&model=${puti}`;
+    const command = args.join(" ").split("|");
+    if (command.length !== 2) {
+      if (args[0].toLowerCase() === 'list') {
+        return api.sendMessage(`Supported voice IDs are:\n ${supportedIds.join("\n")}`, event.threadID, event.messageID);
+      }
+      return message.reply(`❌Invalid command format. Use it like this:\n${p}voice rachel | Hey there`);
+    }
 
-		try {
-			const response = await axios.get(link);
-			const speak_url = response.data.speak_url;
+    const voiceId = command[0].trim().toLowerCase();
+    const text = command[1].trim();
 
-			message.reply({
-				body: 'Here is your TTS',
-				attachment: await global.utils.getStreamFromURL(speak_url)
-			});
-		} catch (error) {
-			console.error('Error:', error.message);
-			return message.reply('An error occurred while processing the request.');
-		}
-	}
+    if (!supportedIds.includes(voiceId)) {
+      return message.reply(`❌Invalid voice ID. Supported IDs are:\n ${supportedIds.join("\n")}`);
+    }
+
+    const apiKey = 'api1';
+    const apiUrl = `https://for-devs.onrender.com/api/voice?text=${encodeURIComponent(text)}&voiceid=${voiceId}&apikey=${apiKey}`;
+
+    try {
+      const voiceStream = await getStreamFromURL(apiUrl);
+
+      if (voiceStream) {
+        return api.sendMessage({ attachment: voiceStream }, event.threadID, event.messageID);
+      } else {
+        return api.sendMessage('Failed to generate voice.', event.threadID, event.messageID);
+      }
+    } catch (error) {
+      console.error(error);
+      return api.sendMessage('Failed to generate voice.', event.threadID, event.messageID);
+    }
+  }
 };
