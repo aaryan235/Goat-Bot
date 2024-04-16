@@ -2,7 +2,7 @@ const axios = require('axios');
 
 module.exports = {
 	config: {
-		name: "imagine",
+		name: "imaginev2",
 		version: "1.0",
 		author: "rehat--",
 		countDown: 10,
