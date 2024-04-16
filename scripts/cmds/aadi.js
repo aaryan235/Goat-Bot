@@ -1,93 +1,150 @@
-const axios = require('axios');
-const tracker = {};
-
-/*
-A Turtle APIs Production created by Turtle Rehat.
-Do not alter the credited information any attempt to do so may result in a permanent ban from Project86 APIs and Turtle APIs.
-*/
+const axios = require("axios");
+const fs = require("fs");
+const cookie = 'g.a000gwjZPsBzoru_Dpb-CoUh6UQ3JekMEfiMm1laQxFCoJp0BEW-GuzD7Sfu8u-5XroU0TpL_AACgYKAYISAQASFQHGX2MidZEGtbNVcAvVRF1F3s9MNxoVAUF8yKo_xsCeW7gxzVvnwSgzP63p0076';
 
 module.exports = {
-	config: {
-		name: "aadi",
-		version: "1.0",
-		author: "rehat--",
-		countDown: 5,
-		role: 0,
-		longDescription: "Chat GPT 4 Most Advance LLM",
-		category: "ai",
-		guide: { en: "{pn} <query>" },
-	},
-	clearHistory: function () {
-		global.GoatBot.onReply.clear();
-	},
-	onStart: async function ({ message, event, args, usersData, api, commandName }) {
-		const prompt = args.join(' ');
-		const userID = event.senderID;
-		const mid = event.messageID;
+  config: {
+    name: "aadi",
+    aliases: ["g"],
+    version: "1.0",
+    author: "rehat--",
+    countDown: 5,
+    role: 0,
+    longDescription: { en: "Artificial Intelligence Google Gemini" },
+    guide: { en: "{pn} <query>" },
+    category: "ai",
+  },
+  clearHistory: function () {
+    global.GoatBot.onReply.clear();
+  },
 
-		if (!args[0]) return message.reply('Please enter a query.');
+  onStart: async function ({ message, event, args, commandName }) {
+    const uid = event.senderID;
+    const prompt = args.join(" ");
 
-		if (args[0] == 'clear') {
-			this.clearHistory();
-			const c = await clean(userID);
-			if (c) return message.reply('Conversation history cleared.');
-		}
+    if (!prompt) {
+      message.reply("Please enter a query.");
+      return;
+    }
 
-		api.setMessageReaction('⏳', mid, () => {}, true);
-		gpt(prompt, userID, message, mid, api);
-	},
+    if (prompt.toLowerCase() === "clear") {
+      this.clearHistory();
+      const clear = await axios.get(`https://project-gemini-daac55836bf7.herokuapp.com/api/gemini?query=clear&uid=${uid}&cookie=${cookie}`);
+      message.reply(clear.data.message);
+      return;
+    }
 
-	onReply: async function ({ Reply, message, event, args, api, usersData }) {
-		const { author } = Reply;
-		if (author !== event.senderID) return;
+    let apiUrl = `https://project-gemini-daac55836bf7.herokuapp.com/api/gemini?query=${encodeURIComponent(prompt)}&uid=${uid}&cookie=${cookie}`;
 
-		const mid = event.messageID;
-		const prompt = args.join(' ');
-		const userID = event.senderID;
+    if (event.type === "message_reply") {
+      const imageUrl = event.messageReply.attachments[0]?.url;
+      if (imageUrl) {
+        apiUrl += `&attachment=${encodeURIComponent(imageUrl)}`;
+      }
+    }
 
-		if (args[0] == 'clear') {
-			this.clearHistory();
-			const c = await clean(userID);
-			if (c) return message.reply('Conversation history cleared.');
-		}
+    try {
+      const response = await axios.get(apiUrl);
+      const result = response.data;
 
-		api.setMessageReaction('⏳', mid, () => {}, true);
-		gpt(prompt, userID, message, mid, api);
-	}
-};
+      let content = result.message;
+      let imageUrls = result.imageUrls;
 
-async function clean(userID) {
-	if (!tracker[userID]) return true;
-	if (tracker[userID]) {
-		delete tracker[userID];
-		return true;
-	}
-}
+      let replyOptions = {
+        body: content,
+      };
 
-async function gpt(text, userID, message, mid, api) {
-	tracker[userID] = tracker[userID] || '';
-	tracker[userID] += `${text}.\n`;
+      if (Array.isArray(imageUrls) && imageUrls.length > 0) {
+        const imageStreams = [];
 
-	try {
-		const url = 'https://project86.cyclic.app/api/chat';
+        if (!fs.existsSync(`${__dirname}/cache`)) {
+          fs.mkdirSync(`${__dirname}/cache`);
+        }
 
-		const conversationHistory = encodeURIComponent(tracker[userID]);
-		const getUrl = `${url}?query=${conversationHistory}`;
+        for (let i = 0; i < imageUrls.length; i++) {
+          const imageUrl = imageUrls[i];
+          const imagePath = `${__dirname}/cache/image` + (i + 1) + ".png";
 
-		const response = await axios.post(getUrl);
+          try {
+            const imageResponse = await axios.get(imageUrl, {
+              responseType: "arraybuffer",
+            });
+            fs.writeFileSync(imagePath, imageResponse.data);
+            imageStreams.push(fs.createReadStream(imagePath));
+          } catch (error) {
+            console.error("Error occurred while downloading and saving the image:", error);
+            message.reply('An error occurred.');
+          }
+        }
 
-		const resultText = response.data.answer;
-		tracker[userID] = `${tracker[userID]}${text}.\n${resultText}`;
+        replyOptions.attachment = imageStreams;
+      }
 
-		api.setMessageReaction('✅', mid, () => {}, true);
-		message.reply(`${resultText}\n\n𝙔𝙤𝙪 𝙘𝙖𝙣 𝙧𝙚𝙥𝙡𝙮 𝙩𝙤 𝙘𝙤𝙣𝙩𝙞𝙣𝙪𝙚 𝙘𝙝𝙖𝙩𝙩𝙞𝙣𝙜.`, (error, info) => {
-			global.GoatBot.onReply.set(info.messageID, {
-				commandName: 'ai',
-				author: userID,
-			});
-		});
-	} catch (error) {
-		api.setMessageReaction('❌', mid, () => {}, true);
-		message.reply('An error occurred.');
-	}
-}
+      message.reply(replyOptions, (err, info) => {
+        if (!err) {
+          global.GoatBot.onReply.set(info.messageID, {
+            commandName,
+            messageID: info.messageID,
+            author: event.senderID,
+          });
+        }
+      });
+    } catch (error) {
+      message.reply('An error occurred.');
+      console.error(error.message);
+    }
+  },
+
+  onReply: async function ({ message, event, Reply, args }) {
+    const prompt = args.join(" ");
+    let { author, commandName, messageID } = Reply;
+    if (event.senderID !== author) return;
+
+    try {
+      const apiUrl = `https://project-gemini-daac55836bf7.herokuapp.com/api/gemini?query=${encodeURIComponent(prompt)}&uid=${author}&cookie=${cookie}`;
+      const response = await axios.get(apiUrl);
+
+      let content = response.data.message;
+      let replyOptions = {
+        body: content,
+      };
+
+      const imageUrls = response.data.imageUrls;
+      if (Array.isArray(imageUrls) && imageUrls.length > 0) {
+        const imageStreams = [];
+
+        if (!fs.existsSync(`${__dirname}/cache`)) {
+          fs.mkdirSync(`${__dirname}/cache`);
+        }
+        for (let i = 0; i < imageUrls.length; i++) {
+          const imageUrl = imageUrls[i];
+          const imagePath = `${__dirname}/cache/image` + (i + 1) + ".png";
+
+          try {
+            const imageResponse = await axios.get(imageUrl, {
+              responseType: "arraybuffer",
+            });
+            fs.writeFileSync(imagePath, imageResponse.data);
+            imageStreams.push(fs.createReadStream(imagePath));
+          } catch (error) {
+            console.error("Error occurred while downloading and saving the image:", error);
+            message.reply('An error occurred.');
+          }
+        }
+        replyOptions.attachment = imageStreams;
+      }
+      message.reply(replyOptions, (err, info) => {
+        if (!err) {
+          global.GoatBot.onReply.set(info.messageID, {
+            commandName,
+            messageID: info.messageID,
+            author: event.senderID,
+          });
+        }
+      });
+    } catch (error) {
+      console.error(error.message);
+      message.reply("An error occurred.");
+    }
+  },
+}; 
