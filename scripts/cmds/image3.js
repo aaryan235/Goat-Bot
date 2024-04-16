@@ -2,7 +2,7 @@ const axios = require('axios');
 
 module.exports = {
   config: {
-    name: "imagine",
+    name: "imagine2",
     aliases: ["text2image"],
     version: "3.0",
     author: "Aliester Crowley",
