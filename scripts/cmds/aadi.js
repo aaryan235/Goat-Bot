@@ -1,36 +1,44 @@
-const axios = require('axios');
+const axios = require("axios");
 
 module.exports = {
-                config: {
-                                name: "aadi",
-                                version: "1.0.0",
-                                role: 0,
-                                author: "Developer",
-                                shortDescription: "Get a response from gemini AI",
-                                countDown: 0,
-                                category: "Ai",
-                                guide: {
-                                                en: '{p}gemini [prompt]'
-                                }
-                },
-
-                onStart: async ({ api, event, args }) => {
-                                const prompt = args.join(" ");
-                                api.setMessageReaction("📝", event.messageID, () => {}, true);
-
-                                if (!prompt) {
-                                                return api.sendMessage("Hello there, how can I assist you today?", event.threadID, event.messageID);
-                                }
-
-                                try {
-                                                const response = await axios.get(`https://gemini-d1p.onrender.com/dipto?prompt=${prompt}`);
-                                                const di = response.data.dipto; 
-                                                api.setMessageReaction("✅", event.messageID, () => {}, true);
-
-                                                api.sendMessage(`${di}`, event.threadID, event.messageID);
-                                } catch (error) {
-                                                console.error('ERROR', error.response?.data || error.message);
-                                                api.sendMessage('An error occurred while processing the command.', event.threadID);
-                                }
-                }
+  config: {
+    name: "aadi",
+    version: "1.0",
+    author: "Dipto",
+    description:"gemeini ai",
+    countDown: 5,
+    role: 0,
+    category: "google",
+    guide: {
+      en: "{pn} message | photo reply"
+    }
+  },
+  onStart:async ({ api, args , event}) => {
+  const prompt = args.join(' ');
+//---- Image Reply -----//
+   if (event.type === "message_reply") {
+  var t = event.messageReply.attachments[0].url;
+    try {
+      const response= await axios.get(`https://noobs-api.onrender.com/dipto/gemini?prompt=${encodeURIComponent(prompt)}&url=${encodeURIComponent(t)}`)
+      const data2 = response.data.dipto;
+  api.sendMessage(data2, event.threadID, event.messageID);
+  } catch (error) {
+    console.error('Error:', error.message);
+    api.sendMessage(error, event.threadID, event.messageID);
+  }
+  }
+  //---------- Message Reply ---------//
+else if(!prompt) {
+   return api.sendMessage('Please provide a prompt or message reply', event.threadID, event.messageID);}
+    else {
+  try {
+    const respons = await axios.get(`https://noobs-api.onrender.com/dipto/gemini?prompt=${encodeURIComponent(prompt)}`)
+    const message = respons.data.dipto;
+    api.sendMessage(message, event.threadID,event.messageID);
+    } catch (error) {
+      console.error('Error calling Gemini AI:', error);
+      api.sendMessage(`Sorry, there was an error processing your request.${error}`, event.threadID, event.messageID);
+  }
+ }
+}
 };
