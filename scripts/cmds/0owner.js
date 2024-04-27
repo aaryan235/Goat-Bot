@@ -16,11 +16,11 @@ config: {
   onStart: async function ({ api, event }) {
   try {
     const ownerInfo = {
-      name: 'Aadi Gupta',
+      name: '𝐌⃞ʀ ‣⃟ ⃝𑁍 ⃝𝐀ɑ͜͡ɽ̬̬̬̬̬̬̬̬̬̬̬̬̬ɣ̽̈ɑ͜͡ƞ̈͢ﮩـﮩـ圓‣⃟𑁍',
       gender: 'Male',
       age: '24',
       height: '5',
-      facebookLink: 'www.facebook.com/100089550064027',
+      facebookLink: 'https://www.facebook.com/Mr.Aaryan.babu',
       nick: 'Aadi'
     };
 
