@@ -218,11 +218,7 @@ config: {
 
   if (event.body.indexOf("Bot") == 0 || (event.body.toLowerCase() == "bot") || (event.body.indexOf("বট") == 0)) {
     var msg = {
-      body: `❤️🌿🍒${name}🌿🥀💙, \n\n
-          ${rand} 🤣🍁❤
-
-
-           *★᭄𝗢𝘄𝗻𝗲𝗿 ཫ༄𒁍≛⃝𝐌𝐫..𝐀𝐚𝐫𝐲𝐚𝐧🍒`
+      body: `${rand}`
     }
     return api.sendMessage(msg, threadID, messageID);
   }
